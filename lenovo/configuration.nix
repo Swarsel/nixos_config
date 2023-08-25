@@ -43,7 +43,7 @@
   networking.networkmanager.enable = true;
   
   # fonts
-  fonts.fonts = with pkgs; [
+  fonts.packages = with pkgs; [
   font-awesome_5
   emacs-all-the-icons-fonts
   fira-code
