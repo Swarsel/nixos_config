@@ -10,12 +10,12 @@
       ./hardware-configuration.nix
     ];
    
-  nix = {
-  package = pkgs.nixFlakes;
-  extraOptions = ''
-    experimental-features = nix-command flakes
-  '';
-};
+  #nix = {
+  #package = pkgs.nixFlakes;
+  #extraOptions = ''
+  #  experimental-features = nix-command flakes
+  #'';
+#};
   nix.settings.experimental-features = ["nix-command" "flakes"];
 
   # wayland-related
@@ -73,6 +73,9 @@
     xkbVariant = "nodeadkeys";
   };
 
+  # enable blueman
+  services.blueman.enable = true;
+
   # Define a user account. Don't forget to set a password with ‘passwd’.
   users.users.swarsel = {
     isNormalUser = true;
@@ -98,6 +101,15 @@
 
   # List packages installed in system profile. To search, run:
   # $ nix search wget
+#  let
+#	my-python-packages = ps: with ps; [
+#		pandas
+#		requests
+#		scipy
+#		numpy
+#		matplotlib
+#	];
+# in
   environment.systemPackages = with pkgs; [
   #  vim # Do not forget to add an editor to edit configuration.nix! The Nano editor is also installed by default.
   #  wget
@@ -105,6 +117,7 @@
   font-awesome_5
   emacs-all-the-icons-fonts
   nerdfonts
+  (python3.withPackages(ps: with ps; [ pandas requests numpy scipy matplotlib pygobject3 gst-python playerctl]))
   ];
 
   # Some programs need SUID wrappers, can be configured further or are
@@ -114,7 +127,10 @@
   #   enable = true;
   #   enableSSHSupport = true;
   # };
+ 
+  # Sway stuff
   #programs.sway.enable = true;
+  xdg.portal.wlr.enable = true;
 
   # zsh
   programs.zsh.enable = true;
@@ -122,7 +138,11 @@
   environment.shells = with pkgs; [ zsh ];
   environment.pathsToLink = [ "/share/zsh" ];
 
+  # Backlight
+  programs.light.enable = true;
+
   # List services that you want to enable:
+
 
   # Enable the OpenSSH daemon.
   # services.openssh.enable = true;

@@ -39,6 +39,17 @@
 	autotiling
 	schildichat-desktop-wayland
 	exa
+	wev
+	brightnessctl
+	playerctl
+	networkmanagerapplet
+        discord
+	libappindicator-gtk3
+	anki
+	xdg-desktop-portal 
+	grim
+	slurp
+	xdg-desktop-portal-wlr
     # # Adds the 'hello' command to your environment. It prints a friendly
     # # "Hello, world!" when run.
     # pkgs.hello
@@ -92,6 +103,11 @@
   # if you don't want to manage your shell through Home Manager.
   home.sessionVariables = {
     #EDITOR = "emacs";
+    SDL_VIDEODRIVER="wayland";
+    _JAVA_AWT_WM_NONREPARENTING=1;
+    QT_QPA_PLATFORM="wayland";
+    XDG_CURRENT_DESKTOP="sway";
+    XDG_SESSION_DESKTOP="sway";
   };
 
   # Let Home Manager install and manage itself.
@@ -101,14 +117,17 @@
   services.syncthing = {
 	enable = true;
 	tray.enable = true;
-	extraOptions = [
-		"--wait"
-		];
+	#extraOptions = [
+	#	"--wait"
+	#	];
 	};
+  services.syncthing.tray.command = "syncthingtray --wait";
+
+  services.blueman-applet.enable = true;
 
   services.nextcloud-client = {
 	enable = true;
-	startInBackground = true;
+	#startInBackground = true;
 	};
 
   services.mako = {
@@ -190,8 +209,8 @@ background-color: #44475a;
 	shellAliases = {
 		ls = "exa -la";
 		hg = "history | grep";
-		hmswitch = "home-manager --flake .#swarsel@nixos switch";
-		nswitch  = "sudo nixos-rebuild --flake .#nixos switch"; 
+		hmswitch = "cd ~/.dotfiles; home-manager --flake .#swarsel@nixos switch; cd -;";
+		nswitch  = "cd ~/.dotfiles; sudo nixos-rebuild --flake .#nixos switch; cd -;"; 
 	};
 	enableAutosuggestions = true;
 	enableCompletion = true;
@@ -236,7 +255,8 @@ background-color: #44475a;
                "*" = {
                 	xkb_layout = "de";
                 	xkb_options = "grp:win_space_toggle";
-                };
+			xkb_variant = "nodeadkeys";                
+		};
 		"type:touchpad" = {
        			dwt = "enabled";
        			tap = "enabled";
@@ -257,28 +277,34 @@ background-color: #44475a;
 		"${modifier}+F12" = "scratchpad show";
 		"${modifier}+p" = "exec wl-mirror eDP-1";
 		"${modifier}+c" = "exec qalculate-gtk";
-		"${modifier}+x" = "mode exit";
+		"${modifier}+x" = "mode $exit";
+		"${modifier}+s" = "exec grim -g \"$(slurp)\" -t png - | wl-copy -t image/png";
+		"${modifier}+1" = "workspace 1:一";
+		"${modifier}+Shift+1" = "move container to workspace 1:一";
+		"${modifier}+2" = "workspace 2:二";
+		"${modifier}+Shift+2" = "move container to workspace 2:二";
+		"${modifier}+3" = "workspace 3:三";
+		"${modifier}+Shift+3" = "move container to workspace 3:三";
+		"${modifier}+4" = "workspace 4:四";
+		"${modifier}+Shift+4" = "move container to workspace 4:四";
+		"${modifier}+5" = "workspace 5:五";
+		"${modifier}+Shift+5" = "move container to workspace 5:五";
+		"${modifier}+6" = "workspace 6:六";
+		"${modifier}+Shift+6" = "move container to workspace 6:六";
+		"${modifier}+7" = "workspace 7:七";
+		"${modifier}+Shift+7" = "move container to workspace 7:七";
+		"${modifier}+8" = "workspace 8:八";
+		"${modifier}+Shift+8" = "move container to workspace 8:八";
+		"${modifier}+9" = "workspace 9:九";
+		"${modifier}+Shift+9" = "move container to workspace 9:九";
+		"${modifier}+0" = "workspace 10:十";
+		"${modifier}+Shift+0" = "move container to workspace 10:十";
+		"XF86AudioRaiseVolume" = "exec pactl set-sink-volume @DEFAULT_SINK@ +5%";
+		"XF86AudioLowerVolume" = "exec pactl set-sink-volume @DEFAULT_SINK@ -5%";
+		"XF86MonBrightnessUp"  = "exec brightnessctl set +5%";
+		"XF86MonBrightnessDown"= "exec brightnessctl set 5%-";
 		};
 	modes = {
-		resize = {
-    			Down = "resize grow height 10 px";
-   			Escape = "mode default";
-    			Left = "resize shrink width 10 px";
-    			Return = "mode default";
-    			Right = "resize grow width 10 px";
-    			Up = "resize shrink height 10 px";
-    			h = "resize shrink width 10 px";
-    			j = "resize grow height 10 px";
-    			k = "resize shrink height 10 px";
-    			l = "resize grow width 10 px";
-  		};
-		exit = {
-			s = "exec systemctl suspend";
-			p = "exec systemctl poweroff";
-			r = "exec systemctl reboot";
-			l = "exec swaymsg exit";
-			Escape = "mode 'default'";
-		};
 	};
 	output = {
 		eDP-1 = {
@@ -288,9 +314,10 @@ background-color: #44475a;
    		};
 	};
 	startup = [
+	#{ command = "systemctl --user restart nextcloud-client"; always = true; }
 	#{ command = "systemctl --user restart syncthingtray"; always = true; }
-	{ command = "systemctl --user restart syncthingtray";}
-	{ command = "systemctl --user restart nextcloud-client";}
+	#{ command = "systemctl --user restart syncthingtray";}
+	#{ command = "systemctl --user restart nextcloud-client";}
 	#{ command = "firefox"; }
 	#{ command = "firefox"; }
 	];
@@ -364,9 +391,36 @@ background-color: #44475a;
 	gaps = {
 		inner = 5;
 	};
-     };
-     extraConfig = "
+   };
+
+ extraConfig =let 
+modifier = config.wayland.windowManager.sway.config.modifier;
+in "
 exec_always autotiling
+set $exit \"exit: [s]leep, [p]oweroff, [r]eboot, [l]ogout\"
+mode $exit {
+    
+    bindsym --to-code {
+        s exec \"systemctl suspend\", mode \"default\"
+        p exec \"systemctl poweroff\"
+        r exec \"systemctl reboot\"
+        l exec \"swaymsg exit\"
+    
+        Return mode \"default\"
+        Escape mode \"default\"
+	${modifier}+x mode \"default\"
+    }
+}
+
+
+exec nextcloud-client
+exec nm-applet --indicator
+exec blueman-applet
+exec schildichat-desktop --hidden
+exec Discord --start-minimized
+exec anki
+
+include ~/.config/sway/config.d/*
 ";	
   };
   
