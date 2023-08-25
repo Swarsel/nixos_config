@@ -190,8 +190,8 @@ background-color: #44475a;
 	shellAliases = {
 		ls = "exa -la";
 		hg = "history | grep";
-		hmswitch = "home-manager switch";
-		nswitch  = "sudo nixos-rebuild switch"; 
+		hmswitch = "home-manager --flake .#swarsel@nixos switch";
+		nswitch  = "sudo nixos-rebuild --flake .#nixos switch"; 
 	};
 	enableAutosuggestions = true;
 	enableCompletion = true;
@@ -213,7 +213,8 @@ background-color: #44475a;
 	historySubstringSearch.enable = true;
 	#syntaxHighlighting.enable = true;
 	profileExtra = "eval `keychain --agents ssh --eval id_ed25519`";
-  };
+	#loginExtra = "bash -l sway";  
+};
 		
 
   programs.waybar = {
