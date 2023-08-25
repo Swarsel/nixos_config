@@ -212,7 +212,7 @@ background-color: #44475a;
 		};
 	historySubstringSearch.enable = true;
 	#syntaxHighlighting.enable = true;
-	profileExtra = "eval `keychain --agents ssh --eval id_rsa`";
+	profileExtra = "eval `keychain --agents ssh --eval id_ed25519`";
   };
 		
 
