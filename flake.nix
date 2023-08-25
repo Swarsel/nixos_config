@@ -20,7 +20,7 @@
   		{
     		home-manager.useGlobalPkgs = true;
     		home-manager.useUserPackages = true;
-    		home-manager.users.swarsel = import /home/swarsel/.config/home-manager/home.nix;
+    		home-manager.users.swarsel = import ./home.nix;
   		}
         ];
       };
