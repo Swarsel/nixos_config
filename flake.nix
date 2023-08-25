@@ -15,11 +15,11 @@
     		nixosadminpc = nixpkgs.lib.nixosSystem {
         		system = "x86_64-linux";
         		modules = [
-          			./configuration.nix
+          			./lenovo/configuration.nix
 	  			home-manager.nixosModules.home-manager {
     					home-manager.useGlobalPkgs = true;
     					home-manager.useUserPackages = true;
-    					home-manager.users.swarsel = import ./home.nix;
+    					home-manager.users.swarsel = import ./lenovo/home.nix;
   				}
         		];
 		};
@@ -32,7 +32,7 @@
 				home-manager.nixosModules.home-manager {
 					home-manager.useGlobalPkgs = true;
 					home-manager.useUserPackages = true;
-					home-manager.users.swarsel = import ./home.nix;
+					home-manager.users.swarsel = import ./surface/home.nix;
 				}
 			];
 		};
