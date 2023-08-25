@@ -2,7 +2,7 @@
 # your system.  Help is available in the configuration.nix(5) man page
 # and in the NixOS manual (accessible by running ‘nixos-help’).
 
-{ config, pkgs, ... }:
+{ config, lib, pkgs, ... }:
 
 {
   imports =
@@ -20,7 +20,43 @@
 
   # wayland-related
   security.polkit.enable = true;
-  hardware.opengl.enable = true;
+  hardware.opengl = {
+	enable = true;
+	driSupport = true;
+	driSupport32Bit = true;
+	};
+
+  # nvidia stuff
+  services.xserver.videoDrivers = ["nvidia"];
+  hardware.nvidia = {
+
+    # Modesetting is needed most of the time
+    modesetting.enable = true;
+
+	# Enable power management (do not disable this unless you have a reason to).
+	# Likely to cause problems on laptops and with screen tearing if disabled.
+	powerManagement.enable = true;
+
+    # Use the open source version of the kernel module ("nouveau")
+	# Note that this offers much lower performance and does not
+	# support all the latest Nvidia GPU features.
+	# You most likely don't want this.
+    # Only available on driver 515.43.04+
+    open = false;
+
+    # Enable the Nvidia settings menu,
+	# accessible via `nvidia-settings`.
+    nvidiaSettings = true;
+
+    # Optionally, you may need to select the appropriate driver version for your specific GPU.
+    package = config.boot.kernelPackages.nvidiaPackages.legacy_470;
+    prime = {
+	sync.enable =  true;
+	# Make sure to use the correct Bus ID values for your system!
+	intelBusId = "PCI:0:2:0";
+	nvidiaBusId = "PCI:1:0:0";
+	};
+  };
 
   # audio
   sound.enable = true;
@@ -117,7 +153,7 @@
   font-awesome_5
   emacs-all-the-icons-fonts
   nerdfonts
-  (python3.withPackages(ps: with ps; [ pandas requests numpy scipy matplotlib pygobject3 gst-python playerctl]))
+  (python3.withPackages(ps: with ps; [ pandas requests numpy scipy matplotlib pygobject3 gst-python playerctl python-lsp-server debugpy]))
   ];
 
   # Some programs need SUID wrappers, can be configured further or are
@@ -130,7 +166,7 @@
  
   # Sway stuff
   #programs.sway.enable = true;
-  xdg.portal.wlr.enable = true;
+  #xdg.portal.wlr.enable = true;
 
   # zsh
   programs.zsh.enable = true;

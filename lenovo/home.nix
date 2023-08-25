@@ -33,6 +33,7 @@
 	gnome.gnome-control-center
 	qalculate-gtk
 	obsidian
+	blueman
 	syncthing
 	nextcloud-client
 	spotify
@@ -49,7 +50,9 @@
 	xdg-desktop-portal 
 	grim
 	slurp
-	xdg-desktop-portal-wlr
+	mu
+	isync
+	lshw
     # # Adds the 'hello' command to your environment. It prints a friendly
     # # "Hello, world!" when run.
     # pkgs.hello
@@ -125,10 +128,10 @@
 
   services.blueman-applet.enable = true;
 
-  services.nextcloud-client = {
-	enable = true;
+  #services.nextcloud-client = {
+	#enable = true;
 	#startInBackground = true;
-	};
+	#};
 
   services.mako = {
 	enable = true;
@@ -211,6 +214,8 @@ background-color: #44475a;
 		hg = "history | grep";
 		hmswitch = "cd ~/.dotfiles; home-manager --flake .#swarsel@nixos switch; cd -;";
 		nswitch  = "cd ~/.dotfiles; sudo nixos-rebuild --flake .#nixos switch; cd -;"; 
+		edithome = "nano ~/.dotfiles/lenovo/home.nix";
+		editnix = "nano ~/.dotfiles/lenovo/configuration.nix";
 	};
 	enableAutosuggestions = true;
 	enableCompletion = true;
@@ -279,6 +284,7 @@ background-color: #44475a;
 		"${modifier}+c" = "exec qalculate-gtk";
 		"${modifier}+x" = "mode $exit";
 		"${modifier}+s" = "exec grim -g \"$(slurp)\" -t png - | wl-copy -t image/png";
+		"${modifier}+i" = "exec \"bash ~/.config/scripts/startup.sh\"";
 		"${modifier}+1" = "workspace 1:一";
 		"${modifier}+Shift+1" = "move container to workspace 1:一";
 		"${modifier}+2" = "workspace 2:二";
@@ -319,14 +325,14 @@ background-color: #44475a;
 	#{ command = "systemctl --user restart syncthingtray";}
 	#{ command = "systemctl --user restart nextcloud-client";}
 	#{ command = "firefox"; }
-	#{ command = "firefox"; }
+	{ command = "exec \"bash ~/.config/scripts/startup.sh\"";}
 	];
 	window = {
 		border = 1;
 		titlebar = false;
 	};
 	assigns = {
-		"1" = [{ class = "^Firefox$"; }];
+		#"1" = [{ class = "^Firefox$"; }];
 	};
 	colors = {
 		focused = {
@@ -412,15 +418,11 @@ mode $exit {
     }
 }
 
-
-exec nextcloud-client
-exec nm-applet --indicator
-exec blueman-applet
-exec schildichat-desktop --hidden
-exec Discord --start-minimized
-exec anki
+workspace 1:一
 
 include ~/.config/sway/config.d/*
+exec \"bash ~/.config/scripts/startup.sh\"
+
 ";	
   };
   
