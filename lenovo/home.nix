@@ -28,9 +28,6 @@
 	wl-mirror
 	kitty
 	keychain
-	gnome.gnome-clocks
-	gnome.gnome-system-monitor
-	gnome.gnome-control-center
 	qalculate-gtk
 	obsidian
 	blueman
@@ -287,6 +284,7 @@ background-color: #44475a;
   		"${modifier}+f" = "exec firefox";
   		"${modifier}+e" = "exec emacs";
   		"${modifier}+m" = "exec spotify";
+		"${modifier}+Shift+d" = "exec wofi --show run -Iib -l 5 -W 500 -x -10 -y -51";
   		"${modifier}+n" = "exec sway output eDP-1 transform normal, splith";
   		"${modifier}+t" = "exec sway output eDP-1 transform 90, splitv";
 		"${modifier}+Shift+F12" = "move scratchpad";
@@ -368,11 +366,19 @@ background-color: #44475a;
     				title = "^Picture-in-Picture$";
   				}
   				{app_id = "qalculate-gtk";}
+  				{app_id = "org.gnome.clocks";}
+  				{app_id = "com.github.stsdc.monitor";}
   				{app_id = "python3";}
   				{app_id = "blueman";}
+  				{app_id = "pavucontrol";}
+  				{app_id = "syncthingtray";}
+  				{app_id = "SchildiChat";}
+				{app_id = "com.nextcloud.desktopclient.nextcloud";}
   				{app_id = "gnome-system-monitor";}
   				{title = "(?:Open|Save) (?:File|Folder|As)";}
   				{title = "Add";}
+  				{title = "com-jgoodies-jdiskreport-JDiskReport";}
+				{class = "discord";}
   				{window_role = "pop-up";}
   				{window_role = "bubble";}
   				{window_role = "dialog";}

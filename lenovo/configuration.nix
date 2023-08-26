@@ -153,7 +153,7 @@
   font-awesome_5
   emacs-all-the-icons-fonts
   nerdfonts
-  (python3.withPackages(ps: with ps; [ pandas requests numpy scipy matplotlib pygobject3 gst-python playerctl python-lsp-server debugpy]))
+  (python3.withPackages(ps: with ps; [ pandas requests numpy scipy matplotlib python-lsp-server debugpy]))
   ];
 
   # Some programs need SUID wrappers, can be configured further or are

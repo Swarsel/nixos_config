@@ -31,6 +31,7 @@
 			#extraSpecialArgs = { inherit inputs outputs; };
 			modules = [ 
 				./lenovo/home.nix
+				./lenovo/modules/waybar.nix
 			];
 		};
 	};                	

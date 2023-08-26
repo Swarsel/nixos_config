@@ -1,11 +1,16 @@
 { config, pkgs, fetchFromGitHub, ... }:
 
 {
-  home.packages = [
-    pkgs.playerctl
+  home.packages = with pkgs; [
+    playerctl
+    pavucontrol
+    pamixer
+    gnome.gnome-clocks
+    wlogout    
+    jdiskreport
+    monitor
   ];
 
-  };
   programs.waybar = {
     enable = true;
     settings = {
@@ -13,10 +18,10 @@
         layer = "top";
 	position = "top";
         modules-left = [ "sway/workspaces" "custom/outer-right-arrow-dark" "sway/window"];
-        modules-right = ["custom/outer-left-arrow-dark" "custom/spotify" "custom/left-arrow-light"
-         	"custom/bandwidth"
+        modules-right = ["custom/outer-left-arrow-dark" "mpris" "custom/left-arrow-light"
+         	"network"
 		"custom/left-arrow-dark"
-		"network"
+		"temperature"
                 "custom/left-arrow-light"
 		"disk"
 		"custom/left-arrow-dark"
@@ -37,13 +42,42 @@
 	"sway/mode" = {
 		format = "<span style=\"italic\" font-weight=\"bold\">{}</span>";
 	};
-	"custom/spotify" = {
-                exec =  "/usr/bin/python3 ~/.config/waybar/resources/custom_modules/mediaplayer.py --player spotify";
-                format = "  {}";
-                return-type = "json";
-                on-click-right = "playerctl play-pause";
-		on-click = "exec swaymsg [class=\"Spotify\"] scratchpad show";
-        };
+	#"custom/spotify" = {
+        #        exec =  "/usr/bin/python3 ~/.config/waybar/resources/custom_modules/mediaplayer.py --player spotify";
+        #        format = "  {}";
+        #        return-type = "json";
+        #        on-click-right = "playerctl play-pause";
+	#	on-click = "exec swaymsg [class=\"Spotify\"] scratchpad show";
+        #};
+	
+	temperature = {
+    	#thermal-zone= 2;
+    	hwmon-path= "/sys/devices/platform/coretemp.0/hwmon/hwmon3/temp3_input";
+    	critical-threshold = 80;
+    	format-critical = " {temperatureC}°C";
+    	format = " {temperatureC}°C";
+	#on-click= "grim -g \"$(slurp)\" -t png - | wl-copy -t";
+	
+	};
+
+	mpris = {
+	#format= "{player_icon} {title} by {artist} ({album}) <small>[{position}/{length}]</small>";
+	format= "{player_icon} {title} <small>[{position}/{length}]</small>";
+	#format-paused=  "{status_icon} <i>{title} by {artist} ({album}) <small>[{position}/{length}]</small></i>";
+	format-paused=  "{status_icon} <i>{title} <small>[{position}/{length}]</small></i>";
+	player-icons=  {
+		"default" = "▶ ";
+		"mpv" = "🎵";
+		"spotify" = " ";
+	};
+	status-icons= {
+		"paused"= "⏸ ";
+	};
+	interval = 1;
+	title-len = 20;
+	artist-len = 20;
+	album-len = 10;
+	};
 	"custom/left-arrow-dark" = {
 		format = "";
 		tooltip = false;
@@ -73,16 +107,15 @@
 		format= "{name}";
 	};
 
-	clock#1= {
+	"clock#1"= {
 		   min-length= 8;
 		   interval= 1;
 		   format= "{:%H:%M:%S}";
 		   on-click-right= "gnome-clocks";
        		   tooltip-format= "<big>{:%Y %B}</big>\n<tt><small>{calendar}</small></tt>\n\nR:Clocks";
-                 //tooltip-format= "{:%Y-%m-%d | %H:%M}"
         };
 	
-        clock#2= {
+        "clock#2"= {
 		format= "{:%d. %B %Y}";
 		on-click-right= "gnome-clocks";
        		tooltip-format= "<big>{:%Y %B}</big>\n<tt><small>{calendar}</small></tt>\n\nR:Clocks"; 
@@ -91,7 +124,7 @@
 
 	pulseaudio= {
 		format= "{icon} {volume:2}%";
-		format-bluetooth= "{icon}  {volume}%";
+		format-bluetooth= "{icon} {volume}%";
 		format-muted= "MUTE";
 		format-icons= {
 			headphones= "";
@@ -106,19 +139,23 @@
 	};
 	memory= {
 		interval= 5;
-		format= "MEM {}%";
+		format= " {}%";
+		tooltip-format= "Memory: {used:0.1f}G/{total:0.1f}G\nSwap: {swapUsed}G/{swapTotal}G";
+		#on-click= "grim -g \"$(slurp)\" -t png - | wl-copy -t";
 	};
 	cpu= {
 	        min-length= 6;
 		interval= 5;
-		format= "CPU {usage:2}%";
-		on-click-right= "gnome-system-monitor";
-		tooltip-format= "{usage}";   
+		#format= "CPU {usage:2}%";
+		format = "{icon0} {icon1} {icon2} {icon3} {icon4} {icon5} {icon6} {icon7}";
+     		format-icons = ["▁" "▂" "▃" "▄" "▅" "▆" "▇" "█"];		
+		#on-click= "grim -g \"$(slurp)\" -t png - | wl-copy -t";
+		on-click-right= "com.github.stsdc.monitor";   
 
 	};
 	battery= {
 		states= {
-			//"good"= 95;
+			#"good"= 95;
 			"warning"= 60;
 			"error"= 30;
 			"critical"= 15;
@@ -134,37 +171,36 @@
 			""
 			""
 		];
-		on-click-right= "gnome-control-center power";
+		on-click-right= "wlogout -p layer-shell";
 	};
 	disk= {
 		interval= 30;
 		format= "Disk {percentage_used:2}%";
 		path= "/";
-		on-click= "bash ~/.config/scripts/screenshot.sh";
-		on-click-right= "gnome-disks";
+		#on-click= "grim -g \"$(slurp)\" -t png - | wl-copy -t";
+		on-click-right= "jdiskreport";
 		states= {
 			  "warning"= 80;
 			   "critical"= 90;
 		};
+		tooltip-format = "{used} used out of {total} on {path} ({percentage_used}%)\n{free} free on {path} ({percentage_free}%)";
 	};
 	tray= {
 		icon-size= 20;
 	};
 	network= {
+	interval = 5;
 	#interface= "wlp*"; // (Optional) To force the use of this interface
-        format-wifi= "{essid} {signalStrength}% ";
-        format-ethernet= "{ifname}: {ipaddr}/{cidr} ";
+        #format-wifi= "{essid} {signalStrength}% ";
+        format-wifi= "{signalStrength}% ";
+        #format-ethernet= "{ifname}: {ipaddr}/{cidr} ";
+        format-ethernet= "";
         format-linked= "{ifname} (No IP) ";
         format-disconnected= "Disconnected ⚠";
         format-alt= "{ifname}: {ipaddr}/{cidr}";
-        tooltip-format= "{ifname} via {gwaddr}: {essid} {ipaddr}/{cidr}";
-
+        tooltip-format-ethernet= "{ifname} via {gwaddr}: {essid} {ipaddr}/{cidr}\n\n⇡{bandwidthUpBytes} ⇣{bandwidthDownBytes}";
+        tooltip-format-wifi= "{ifname} via {gwaddr}: {essid} {ipaddr}/{cidr} \n{signaldBm}dBm @ {frequency}MHz\n\n⇡{bandwidthUpBytes} ⇣{bandwidthDownBytes}";
 	};
-	custom/bandwidth= {
-        min-length= 14;
-        interval= 2;
-        exec= "INTERFACE=wlp1s0 $HOME/.config/waybar/bandwidth";
-        on-click= "myterm -p -- bash -c 'sudo nethogs -a'";
     };
 };
 
@@ -199,7 +235,8 @@ window#waybar.hidden {
     opacity: 0.2;
 }
 
-.custom-spotify {
+
+#mpris {
     padding: 0 10px;
     background-color: transparent;
     color: #1DB954;
@@ -251,13 +288,13 @@ window#waybar.hidden {
 #pulseaudio,
 #memory,
 #cpu,
-#network,
-#custom-spotify,
+#temperature,
+#mpris,
 #tray {
 	background: @background;
 }
 
-#custom-bandwidth,
+#network,
 #clock.2,
 #battery,
 #cpu,
@@ -288,11 +325,11 @@ window#waybar.hidden {
     background: @foreground-critical;
 }
 
-#custom-bandwidth {
+#network {
     color: #cc99c9;
 }
 
-#network {
+#temperature {
     color: #9ec1cf;
 }
 
@@ -367,6 +404,9 @@ window#waybar.hidden {
 #memory,
 #cpu,
 #tray,
+#temperature,
+#network,
+#mpris,
 #battery,
 #disk {
 	padding: 0 3px;
