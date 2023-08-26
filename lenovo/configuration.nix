@@ -49,7 +49,7 @@
     nvidiaSettings = true;
 
     # Optionally, you may need to select the appropriate driver version for your specific GPU.
-    package = config.boot.kernelPackages.nvidiaPackages.legacy_470;
+    package = config.boot.kernelPackages.nvidiaPackages.stable;
     prime = {
 	sync.enable =  true;
 	# Make sure to use the correct Bus ID values for your system!

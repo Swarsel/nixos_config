@@ -52,7 +52,7 @@
 	slurp
 	mu
 	isync
-	lshw
+
     # # Adds the 'hello' command to your environment. It prints a friendly
     # # "Hello, world!" when run.
     # pkgs.hello
@@ -117,6 +117,11 @@
   programs.home-manager.enable = true;
 
   # Services
+#  services.gpg-agent = {
+#	enable = true;
+#	enableSshSupport = true;
+#	};
+
   services.syncthing = {
 	enable = true;
 	tray.enable = true;
@@ -237,7 +242,7 @@ background-color: #44475a;
 	historySubstringSearch.enable = true;
 	#syntaxHighlighting.enable = true;
 	profileExtra = "eval `keychain --agents ssh --eval id_ed25519`";
-	#loginExtra = "bash -l sway";  
+	#loginExtra = "bash -l sway";	  
 };
 		
 
@@ -248,6 +253,12 @@ background-color: #44475a;
   programs.emacs = {
     enable = true;
    };
+	
+  programs.password-store = {
+	enable = true;
+	package = pkgs.pass.withExtensions (exts: [exts.pass-otp]);
+  };
+
  
   wayland.windowManager.sway = {
     enable = true;
