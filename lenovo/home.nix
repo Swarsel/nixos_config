@@ -30,14 +30,12 @@
 	keychain
 	qalculate-gtk
 	obsidian
-	blueman
 	syncthing
 	nextcloud-client
 	spotify
 	autotiling
 	schildichat-desktop-wayland
 	exa
-	wev
 	brightnessctl
 	playerctl
 	networkmanagerapplet
@@ -101,7 +99,7 @@
   #
   # if you don't want to manage your shell through Home Manager.
   home.sessionVariables = {
-    #EDITOR = "emacsclient -c -a nano";
+    EDITOR = "emacsclient -c -a nano";
     SDL_VIDEODRIVER="wayland";
     _JAVA_AWT_WM_NONREPARENTING=1;
     QT_QPA_PLATFORM="wayland";
@@ -133,6 +131,8 @@
 	#enable = true;
 	#startInBackground = true;
 	#};
+  
+  services.emacs.enable = true;
 
   services.mako = {
 	enable = true;
@@ -213,6 +213,7 @@ background-color: #44475a;
 	shellAliases = {
 		ls = "exa -la";
 		hg = "history | grep";
+		e = "emacsclient -c -a nano";
 		hmswitch = "cd ~/.dotfiles; home-manager --flake .#swarsel@nixos switch; cd -;";
 		nswitch  = "cd ~/.dotfiles; sudo nixos-rebuild --flake .#nixos switch; cd -;"; 
 		edithome = "nano ~/.dotfiles/lenovo/home.nix";

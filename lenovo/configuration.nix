@@ -183,10 +183,10 @@
   environment.pathsToLink = [ "/share/zsh" ];
   
   # emacs
-  services.emacs = {
-  enable = true;
-  defaultEditor = true;
-  };
+  #services.emacs = {
+  #enable = true;
+  #defaultEditor = true;
+  #};
 
   # Backlight
   # programs.light.enable = true;
