@@ -49,7 +49,6 @@
 	slurp
 	mu
 	isync
-
     # # Adds the 'hello' command to your environment. It prints a friendly
     # # "Hello, world!" when run.
     # pkgs.hello
@@ -102,7 +101,7 @@
   #
   # if you don't want to manage your shell through Home Manager.
   home.sessionVariables = {
-    #EDITOR = "emacs";
+    #EDITOR = "emacsclient -c -a nano";
     SDL_VIDEODRIVER="wayland";
     _JAVA_AWT_WM_NONREPARENTING=1;
     QT_QPA_PLATFORM="wayland";
@@ -239,7 +238,8 @@ background-color: #44475a;
 	historySubstringSearch.enable = true;
 	#syntaxHighlighting.enable = true;
 	profileExtra = "eval `keychain --agents ssh --eval id_ed25519`";
-	#loginExtra = "bash -l sway";	  
+	#loginExtra = "bash -l sway";
+	#envExtra = "export EDITOR = \"emacsclient -c -a nano\"";  
 };
 		
 

@@ -18,6 +18,9 @@
 #};
   nix.settings.experimental-features = ["nix-command" "flakes"];
 
+  # correct time between linux and windows
+  time.hardwareClockInLocalTime = true;
+
   # wayland-related
   security.polkit.enable = true;
   hardware.opengl = {
@@ -25,6 +28,7 @@
 	driSupport = true;
 	driSupport32Bit = true;
 	};
+
 
   # nvidia stuff
   services.xserver.videoDrivers = ["nvidia"];
@@ -63,12 +67,15 @@
   nixpkgs.config.pulseaudio = true;
   hardware.pulseaudio.enable = true;
 
+  # bluetooth
+  hardware.bluetooth.enable = true;
+
   # Bootloader.
   boot.loader.grub.enable = true;
   boot.loader.grub.device = "/dev/sda";
   boot.loader.grub.useOSProber = true;
 
-  networking.hostName = "nixosadminpc"; # Define your hostname.
+  networking.hostName = "nixos"; # Define your hostname.
   # networking.wireless.enable = true;  # Enables wireless support via wpa_supplicant.
 
   # Configure network proxy if necessary
@@ -109,6 +116,7 @@
     xkbVariant = "nodeadkeys";
   };
 
+
   # enable blueman
   services.blueman.enable = true;
 
@@ -116,7 +124,7 @@
   users.users.swarsel = {
     isNormalUser = true;
     description = "Leon S";
-    extraGroups = [ "networkmanager" "wheel" ];
+    extraGroups = [ "networkmanager" "wheel" "lp" ];
     packages = with pkgs; [];
   };
   
@@ -125,7 +133,7 @@
 #	];
 
   # Enable automatic login for the user.
-  services.getty.autologinUser = "swarsel";
+  # services.getty.autologinUser = "swarsel";
 
   # Run Sway on startup
   #environment.loginShellInit = ''
@@ -173,9 +181,15 @@
   users.defaultUserShell = pkgs.zsh;
   environment.shells = with pkgs; [ zsh ];
   environment.pathsToLink = [ "/share/zsh" ];
+  
+  # emacs
+  services.emacs = {
+  enable = true;
+  defaultEditor = true;
+  };
 
   # Backlight
-  programs.light.enable = true;
+  # programs.light.enable = true;
 
   # List services that you want to enable:
 
