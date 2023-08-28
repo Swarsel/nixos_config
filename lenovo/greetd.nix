@@ -6,6 +6,8 @@
   services.greetd = {
     enable = true;
     settings = {
+      initial_session.command = "sway";
+      initial_session.user ="swarsel";
      default_session.command = ''
       ${pkgs.greetd.tuigreet}/bin/tuigreet \
         --time \

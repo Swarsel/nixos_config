@@ -86,7 +86,7 @@
   networking.networkmanager.enable = true;
   
   # fonts
-  fonts.fonts = with pkgs; [
+  fonts.packages = with pkgs; [
   font-awesome_5
   emacs-all-the-icons-fonts
   fira-code
@@ -156,7 +156,10 @@
 # in
   environment.systemPackages = with pkgs; [
   #  vim # Do not forget to add an editor to edit configuration.nix! The Nano editor is also installed by default.
-  #  wget
+    #  wget
+
+    gcc
+    gnumake
   fira-code
   font-awesome_5
   emacs-all-the-icons-fonts
@@ -176,6 +179,9 @@
   #programs.sway.enable = true;
   #xdg.portal.wlr.enable = true;
 
+  # dconf
+  programs.dconf.enable = true;
+  
   # zsh
   programs.zsh.enable = true;
   users.defaultUserShell = pkgs.zsh;

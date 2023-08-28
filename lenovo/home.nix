@@ -26,8 +26,7 @@
 	mako
 	wl-clipboard
 	wl-mirror
-	kitty
-	keychain
+	#keychain
 	qalculate-gtk
 	obsidian
 	syncthing
@@ -39,7 +38,7 @@
 	brightnessctl
 	playerctl
 	networkmanagerapplet
-        discord
+  discord
 	libappindicator-gtk3
 	anki
 	xdg-desktop-portal 
@@ -47,6 +46,9 @@
 	slurp
 	mu
 	isync
+  gnome.seahorse
+  sqlite
+  gcr # needed for gnome-secrets to work
     # # Adds the 'hello' command to your environment. It prints a friendly
     # # "Hello, world!" when run.
     # pkgs.hello
@@ -62,7 +64,12 @@
     # # environment:
     # (pkgs.writeShellScriptBin "my-hello" ''
     #   echo "Hello, ${config.home.username}!"
-    # '')
+  # '')
+
+  # e: hides scratchpad depending on state, calls emacsclient for edit and then restores the scratchpad state
+  (pkgs.writeShellScriptBin "e" ''
+  bash ~/.config/scripts/hidekitty.sh && emacsclient -c -a nano "$@" && bash ~/.config/scripts/showkitty.sh
+  '')
   ];
   
   nixpkgs = {
@@ -116,6 +123,11 @@
 #	enableSshSupport = true;
 #	};
 
+  services.gnome-keyring = {
+    enable = true;
+    components = ["pkcs11" "secrets" "ssh"];
+  };
+  
   services.syncthing = {
 	enable = true;
 	tray.enable = true;
@@ -164,6 +176,17 @@ group-by=category
 
   # Additional programs
 
+  programs.kitty = {
+    enable = true;
+    keybindings = {
+      "ctrl+shift+left" = "no_op";
+      "ctrl+shift+right" = "no_op";
+      "ctrl+shift+home" = "no_op";
+      "ctrl+shift+end" = "no_op";
+    };
+    theme = "citylights";
+  };
+  
   programs.wofi = {
 	enable = true;
 	style = ''window {
@@ -213,12 +236,12 @@ background-color: #44475a;
 	shellAliases = {
 		ls = "exa -la";
 		hg = "history | grep";
-		e = "emacsclient -c -a nano";
 		hmswitch = "cd ~/.dotfiles; home-manager --flake .#swarsel@nixos switch; cd -;";
 		nswitch  = "cd ~/.dotfiles; sudo nixos-rebuild --flake .#nixos switch; cd -;"; 
-		edithome = "nano ~/.dotfiles/lenovo/home.nix";
-		editnix = "nano ~/.dotfiles/lenovo/configuration.nix";
-	};
+		edithome = "bash ~/.config/scripts/hidekitty.sh && emacsclient -c -a nano ~/.dotfiles/lenovo/home.nix  && bash ~/.config/scripts/showkitty.sh";
+		editnix = "bash ~/.config/scripts/hidekitty.sh && emacsclient -c -a nano ~/.dotfiles/lenovo/configuration.nix  && bash ~/.config/scripts/showkitty.sh";
+    magit = "emacsclient -nc -e \"(magit-status)\"";
+  };
 	enableAutosuggestions = true;
 	enableCompletion = true;
 	autocd = true;
@@ -250,6 +273,7 @@ background-color: #44475a;
 
   programs.emacs = {
     enable = true;
+    package = pkgs.emacs29;
    };
 	
   programs.password-store = {
@@ -277,8 +301,8 @@ background-color: #44475a;
        			natural_scroll = "enabled";
        			middle_emulation = "enabled";
    		};
-        };
-	keybindings = let
+  };
+  keybindings = let
   		modifier = config.wayland.windowManager.sway.config.modifier;
 		in lib.mkOptionDefault {
   		"${modifier}+q" = "kill";
@@ -416,7 +440,9 @@ background-color: #44475a;
 		inner = 5;
 	};
    };
-
+#wrapperFeatures = {
+#    gtk = true;
+#  };
  extraConfig =let 
 modifier = config.wayland.windowManager.sway.config.modifier;
 in "
