@@ -66,6 +66,11 @@
   sound.enable = true;
   nixpkgs.config.pulseaudio = true;
   hardware.pulseaudio.enable = true;
+  hardware.pulseaudio.configFile = pkgs.runCommand "default.pa" {} ''
+  sed 's/module-udev-detect$/module-udev-detect tsched=0/' \
+    ${pkgs.pulseaudio}/etc/pulse/default.pa > $out
+  '';
+
 
   # bluetooth
   hardware.bluetooth.enable = true;
