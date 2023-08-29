@@ -21,8 +21,7 @@
         		system = "x86_64-linux";
         		modules = [
           			./lenovo/configuration.nix
-				        ./lenovo/greetd.nix
-                ./system-nix.nix
+				./lenovo/greetd.nix
         		];
 		};
 	};    
