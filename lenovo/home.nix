@@ -40,7 +40,7 @@
 	networkmanagerapplet
   discord
 	libappindicator-gtk3
-	anki
+	anki-bin
 	xdg-desktop-portal 
 	grim
 	slurp
@@ -112,6 +112,7 @@
     QT_QPA_PLATFORM="wayland";
     XDG_CURRENT_DESKTOP="sway";
     XDG_SESSION_DESKTOP="sway";
+    ANKI_WAYLAND="1";
   };
 
   # Let Home Manager install and manage itself.

@@ -2,7 +2,7 @@
 # your system.  Help is available in the configuration.nix(5) man page
 # and in the NixOS manual (accessible by running ‘nixos-help’).
 
-{ config, lib, pkgs, ... }:
+{ config, lib, pkgs, inputs, ... }:
 
 {
   imports =
@@ -29,6 +29,9 @@
 	driSupport32Bit = true;
 	};
 
+  # make impure cli commands compatible with flakes
+  nix.nixPath = [ "nixpkgs=/etc/channels/nixpkgs" "nixos-config=/etc/nixos/configuration.nix" "/nix/var/nix/profiles/per-user/root/channels" ];
+  environment.etc."channels/nixpkgs".source = inputs.nixpkgs.outPath;
 
   # nvidia stuff
   services.xserver.videoDrivers = ["nvidia"];

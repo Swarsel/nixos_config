@@ -22,7 +22,7 @@
         		modules = [
           			./lenovo/configuration.nix
 				        ./lenovo/greetd.nix
-                ./system-nix.nix
+#                ./system-nix.nix
         		];
 		};
 	};    
