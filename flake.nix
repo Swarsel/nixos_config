@@ -37,6 +37,14 @@
 				./lenovo/modules/waybar.nix
 			];
 		};
+		"leons@fedora" = home-manager.lib.homeManagerConfiguration {
+			pkgs = nixpkgs.legacyPackages.x86_64-linux;
+			#extraSpecialArgs = { inherit inputs outputs; };
+			modules = [ 
+				./surface/home.nix
+				./surface/modules/waybar.nix
+			];
+		};
 	};                	
   };
 }
