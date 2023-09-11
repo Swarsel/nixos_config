@@ -44,8 +44,8 @@
 	xdg-desktop-portal 
 	grim
 	slurp
-	#mu
-	isync
+	mu
+	#isync
   	gnome.seahorse
   	sqlite
   	gcr # needed for gnome-secrets to work
@@ -127,6 +127,11 @@
   services.gnome-keyring = {
     enable = true;
     components = ["pkcs11" "secrets" "ssh"];
+  };
+
+  services.mbsync = {
+  enable = true;
+  configFile = /home/leons/.dotfiles/.mbsyncrc.bak;
   };
   
   services.syncthing = {
@@ -264,6 +269,9 @@ background-color: #44475a;
 	#envExtra = "export EDITOR = \"emacsclient -c -a nano\"";  
 };
 		
+  programs.mbsync = {
+  enable = true;
+  };
 
   programs.waybar = {
 	enable = true;
