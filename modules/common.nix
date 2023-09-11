@@ -11,32 +11,43 @@ home.packages = with pkgs; [
         #keychain
         qalculate-gtk
         obsidian
-        syncthing
-        nextcloud-client
+        syncthingtray
         spotify
         autotiling
         schildichat-desktop-wayland
         eza
         brightnessctl
-        playerctl
         networkmanagerapplet
         discord
         libappindicator-gtk3
-        anki-bin
-        xdg-desktop-portal 
+        anki-bin # this is the normal anki package on the unstable branch
+        xdg-desktop-portal
+        gcr # needed for gnome-secrets to work
+        nextcloud-client
+
+        # screenshotting tools
         grim
         slurp
+
+        # mail related packages
         mu
         #isync
         gnome.seahorse
         sqlite
-        gcr # needed for gnome-secrets to work
 
+        # the following packages are used by waybar
+        playerctl
+        pavucontrol
+        pamixer
+        gnome.gnome-clocks
+        wlogout    
+        jdiskreport
+        monitor
 
-    #e: hides scratchpad depending on state, calls emacsclient for edit and then restores the scratchpad state
-    #(pkgs.writeShellScriptBin "e" ''
-    #bash ~/.config/scripts/hidekitty.sh && emacsclient -c -a nano "$@" && bash ~/.config/scripts/showkitty.sh
-    #'')
+    #E: hides scratchpad depending on state, calls emacsclient for edit and then restores the scratchpad state
+    (pkgs.writeShellScriptBin "e" ''
+    bash ~/.dotfiles/scripts/hidekitty.sh && emacsclient -c -a nano "$@" && bash ~/.dotfiles/scripts/showkitty.sh
+    '')
   ];
 
   nixpkgs = {
@@ -60,6 +71,40 @@ home.sessionVariables = {
     ANKI_WAYLAND="1";
   };
 
+#  services.gpg-agent = {
+#	enable = true;
+#	enableSshSupport = true;
+#	};
+
+  services.gnome-keyring = {
+    enable = true;
+    components = ["pkcs11" "secrets" "ssh"];
+  };
+
+  services.mbsync = {
+  enable = false;
+  };
+
+  services.syncthing = {
+        enable = true;
+        #tray.enable = true;
+        #extraOptions = [
+        #	"--wait"
+        #	];
+        };
+
+  #services.syncthing.tray.command = "syncthingtray --wait";
+
+  services.blueman-applet.enable = true;
+
+  #services.nextcloud-client = {
+    #    enable = true;
+        #startInBackground = true;
+        #};
+        #};
+
+  services.emacs.enable = true;
+
 services.mako = {
           enable = true;
           backgroundColor = "#2e3440";
@@ -76,50 +121,17 @@ services.mako = {
           width = 300;
           font = "monospace 10";
           extraConfig = "[urgency=low]
-  border-color=#cccccc
-  [urgency=normal]
-  border-color=#d08770
-  [urgency=high]
-  border-color=#bf616a
-  default-timeout=0
-  [category=mpd]
-  default-timeout=2000
-  group-by=category
-  ";
+border-color=#cccccc
+[urgency=normal]
+border-color=#d08770
+[urgency=high]
+border-color=#bf616a
+default-timeout=0
+[category=mpd]
+default-timeout=2000
+group-by=category
+";
           };
-
-#  services.gpg-agent = {
-#	enable = true;
-#	enableSshSupport = true;
-#	};
-
-  services.gnome-keyring = {
-    enable = true;
-    components = ["pkcs11" "secrets" "ssh"];
-  };
-
-  services.mbsync = {
-  enable = true;
-  };
-
-  services.syncthing = {
-        enable = true;
-        tray.enable = true;
-        #extraOptions = [
-        #	"--wait"
-        #	];
-        };
-
-  services.syncthing.tray.command = "syncthingtray --wait";
-
-  services.blueman-applet.enable = true;
-
-  #services.nextcloud-client = {
-        #enable = true;
-        #startInBackground = true;
-        #};
-
-  services.emacs.enable = true;
 
 programs.home-manager.enable = true;
 
@@ -184,7 +196,7 @@ programs.zsh = {
 		ls = "exa -la";
 		hg = "history | grep";
 		hmswitch = "cd ~/.dotfiles; home-manager --flake .#leons@fedora switch; cd -;"; 
-		edithome = "emacsclient -c -a nano ~/.dotfiles/surface/home.nix";
+		edithome = "emacsclient -c -a nano ~/.dotfiles/Nix.org";
     magit = "emacsclient -nc -e \"(magit-status)\"";
   };
 	enableAutosuggestions = true;
@@ -214,10 +226,6 @@ programs.mbsync = {
   enable = true;
   };
 
-  programs.waybar = {
-	enable = true;
-  };
-
   programs.emacs = {
     enable = true;
     package = pkgs.emacs29;
@@ -236,406 +244,399 @@ programs.mbsync = {
   };
 
 programs.waybar = {
-    enable = true;
-    settings = {
-      mainBar = {
-        layer = "top";
-        position = "top";
-        modules-left = [ "sway/workspaces" "custom/outer-right-arrow-dark" "sway/window"];
-        modules-right = ["custom/outer-left-arrow-dark" "mpris" "custom/left-arrow-light"
-                "network"
-                "custom/left-arrow-dark"
-                "temperature"
-                "custom/left-arrow-light"
-                "disk"
-                "custom/left-arrow-dark"
-                "memory"
-                "custom/left-arrow-light"
-                "cpu"
-                "custom/left-arrow-dark"
-                "pulseaudio"
-                "custom/left-arrow-light"
-                "battery"
-                "custom/left-arrow-dark"
-                "tray"
-                "custom/left-arrow-light"
-                "clock#2"
-                "custom/left-arrow-dark"
-                "clock#1" ];
-        modules-center = [ "sway/mode" ];
-        "sway/mode" = {
-                format = "<span style=\"italic\" font-weight=\"bold\">{}</span>";
-        };
-        #"custom/spotify" = {
-        #        exec =  "/usr/bin/python3 ~/.config/waybar/resources/custom_modules/mediaplayer.py --player spotify";
-        #        format = "  {}";
-        #        return-type = "json";
-        #        on-click-right = "playerctl play-pause";
-        #	on-click = "exec swaymsg [class=\"Spotify\"] scratchpad show";
-        #};
+      enable = true;
+      settings = {
+        mainBar = {
+          layer = "top";
+          position = "top";
+          modules-left = [ "sway/workspaces" "custom/outer-right-arrow-dark" "sway/window"];
+          modules-right = ["custom/outer-left-arrow-dark" "mpris" "custom/left-arrow-light"
+                  "network"
+                  "custom/left-arrow-dark"
+                  "temperature"
+                  "custom/left-arrow-light"
+                  "disk"
+                  "custom/left-arrow-dark"
+                  "memory"
+                  "custom/left-arrow-light"
+                  "cpu"
+                  "custom/left-arrow-dark"
+                  "pulseaudio"
+                  "custom/left-arrow-light"
+                  "battery"
+                  "custom/left-arrow-dark"
+                  "tray"
+                  "custom/left-arrow-light"
+                  "clock#2"
+                  "custom/left-arrow-dark"
+                  "clock#1" ];
+          modules-center = [ "sway/mode" ];
+          "sway/mode" = {
+                  format = "<span style=\"italic\" font-weight=\"bold\">{}</span>";
+          };
 
-        temperature = {
-        #thermal-zone= 2;
-        hwmon-path= "/sys/devices/platform/coretemp.0/hwmon/hwmon3/temp3_input";
-        critical-threshold = 80;
-        format-critical = " {temperatureC}°C";
-        format = " {temperatureC}°C";
-        #on-click= "grim -g \"$(slurp)\" -t png - | wl-copy -t";
+          temperature = {
+          #thermal-zone= 2;
+          hwmon-path= "/sys/devices/platform/coretemp.0/hwmon/hwmon3/temp3_input";
+          critical-threshold = 80;
+          format-critical = " {temperatureC}°C";
+          format = " {temperatureC}°C";
+          #on-click= "grim -g \"$(slurp)\" -t png - | wl-copy -t";
 
-        };
+          };
 
-        mpris = {
-        #format= "{player_icon} {title} by {artist} ({album}) <small>[{position}/{length}]</small>";
-        format= "{player_icon} {title} <small>[{position}/{length}]</small>";
-        #format-paused=  "{status_icon} <i>{title} by {artist} ({album}) <small>[{position}/{length}]</small></i>";
-        format-paused=  "{status_icon} <i>{title} <small>[{position}/{length}]</small></i>";
-        player-icons=  {
-                "default" = "▶ ";
-                "mpv" = "🎵";
-                "spotify" = " ";
-        };
-        status-icons= {
-                "paused"= "⏸ ";
-        };
-        interval = 1;
-        title-len = 20;
-        artist-len = 20;
-        album-len = 10;
-        };
-        "custom/left-arrow-dark" = {
-                format = "";
-                tooltip = false;
-        };
-        "custom/outer-left-arrow-dark"= {
-                format = "";
-                tooltip = false;
-        };
-        "custom/left-arrow-light"= {
-                format= "";
-                tooltip= false;
-        };
-        "custom/right-arrow-dark"= {
-                format= "";
-                tooltip= false;
-        };
-        "custom/outer-right-arrow-dark"= {
-                format= "";
-                tooltip= false;
-        };
-        "custom/right-arrow-light"= {
-                format= "";
-                tooltip= false;
-        };
-        "sway/workspaces"= {
-                disable-scroll= true;
-                format= "{name}";
-        };
+          mpris = {
+          #format= "{player_icon} {title} by {artist} ({album}) <small>[{position}/{length}]</small>";
+          format= "{player_icon} {title} <small>[{position}/{length}]</small>";
+          #format-paused=  "{status_icon} <i>{title} by {artist} ({album}) <small>[{position}/{length}]</small></i>";
+          format-paused=  "{status_icon} <i>{title} <small>[{position}/{length}]</small></i>";
+          player-icons=  {
+                  "default" = "▶ ";
+                  "mpv" = "🎵";
+                  "spotify" = " ";
+          };
+          status-icons= {
+                  "paused"= "⏸ ";
+          };
+          interval = 1;
+          title-len = 20;
+          artist-len = 20;
+          album-len = 10;
+          };
+          "custom/left-arrow-dark" = {
+                  format = "";
+                  tooltip = false;
+          };
+          "custom/outer-left-arrow-dark"= {
+                  format = "";
+                  tooltip = false;
+          };
+          "custom/left-arrow-light"= {
+                  format= "";
+                  tooltip= false;
+          };
+          "custom/right-arrow-dark"= {
+                  format= "";
+                  tooltip= false;
+          };
+          "custom/outer-right-arrow-dark"= {
+                  format= "";
+                  tooltip= false;
+          };
+          "custom/right-arrow-light"= {
+                  format= "";
+                  tooltip= false;
+          };
+          "sway/workspaces"= {
+                  disable-scroll= true;
+                  format= "{name}";
+          };
 
-        "clock#1"= {
-                   min-length= 8;
-                   interval= 1;
-                   format= "{:%H:%M:%S}";
-                   on-click-right= "gnome-clocks";
-                   tooltip-format= "<big>{:%Y %B}</big>\n<tt><small>{calendar}</small></tt>\n\nR:Clocks";
-        };
+          "clock#1"= {
+                     min-length= 8;
+                     interval= 1;
+                     format= "{:%H:%M:%S}";
+                     on-click-right= "gnome-clocks";
+                     tooltip-format= "<big>{:%Y %B}</big>\n<tt><small>{calendar}</small></tt>\n\nR:Clocks";
+          };
 
-        "clock#2"= {
-                format= "{:%d. %B %Y}";
-                on-click-right= "gnome-clocks";
-                tooltip-format= "<big>{:%Y %B}</big>\n<tt><small>{calendar}</small></tt>\n\nR:Clocks"; 
-        };
+          "clock#2"= {
+                  format= "{:%d. %B %Y}";
+                  on-click-right= "gnome-clocks";
+                  tooltip-format= "<big>{:%Y %B}</big>\n<tt><small>{calendar}</small></tt>\n\nR:Clocks"; 
+          };
 
 
-        pulseaudio= {
-                format= "{icon} {volume:2}%";
-                format-bluetooth= "{icon} {volume}%";
-                format-muted= "MUTE";
-                format-icons= {
-                        headphones= "";
-                        default= [
-                                ""
-                                ""
-                        ];
-                };
-                scroll-step= 1;
-                on-click= "pamixer -t";
-                on-click-right= "pavucontrol";
-        };
-        memory= {
-                interval= 5;
-                format= " {}%";
-                tooltip-format= "Memory: {used:0.1f}G/{total:0.1f}G\nSwap: {swapUsed}G/{swapTotal}G";
-                #on-click= "grim -g \"$(slurp)\" -t png - | wl-copy -t";
-        };
-        cpu= {
-                min-length= 6;
-                interval= 5;
-                #format= handled under SYSTEM SPECIFICS
-                format-icons = ["▁" "▂" "▃" "▄" "▅" "▆" "▇" "█"];		
-                #on-click= "grim -g \"$(slurp)\" -t png - | wl-copy -t";
-                on-click-right= "com.github.stsdc.monitor";   
+          pulseaudio= {
+                  format= "{icon} {volume:2}%";
+                  format-bluetooth= "{icon} {volume}%";
+                  format-muted= "MUTE";
+                  format-icons= {
+                          headphones= "";
+                          default= [
+                                  ""
+                                  ""
+                          ];
+                  };
+                  scroll-step= 1;
+                  on-click= "pamixer -t";
+                  on-click-right= "pavucontrol";
+          };
+          memory= {
+                  interval= 5;
+                  format= " {}%";
+                  tooltip-format= "Memory: {used:0.1f}G/{total:0.1f}G\nSwap: {swapUsed}G/{swapTotal}G";
+                  #on-click= "grim -g \"$(slurp)\" -t png - | wl-copy -t";
+          };
+          cpu= {
+                  min-length= 6;
+                  interval= 5;
+                  #format= handled under SYSTEM SPECIFICS
+                  format-icons = ["▁" "▂" "▃" "▄" "▅" "▆" "▇" "█"];		
+                  #on-click= "grim -g \"$(slurp)\" -t png - | wl-copy -t";
+                  on-click-right= "com.github.stsdc.monitor";   
 
-        };
-        battery= {
-                states= {
-                        #"good"= 95;
-                        "warning"= 60;
-                        "error"= 30;
-                        "critical"= 15;
-                };
-                interval=5;	
-                format= "{icon} {capacity}%";
-                format-charging= "{capacity}% ";
-                format-plugged= "{capacity}% ";
-                format-icons= [
-                        ""
-                        ""
-                        ""
-                        ""
-                        ""
-                ];
-                on-click-right= "wlogout -p layer-shell";
-        };
-        disk= {
-                interval= 30;
-                format= "Disk {percentage_used:2}%";
-                path= "/";
-                #on-click= "grim -g \"$(slurp)\" -t png - | wl-copy -t";
-                on-click-right= "jdiskreport";
-                states= {
-                          "warning"= 80;
-                           "critical"= 90;
-                };
-                tooltip-format = "{used} used out of {total} on {path} ({percentage_used}%)\n{free} free on {path} ({percentage_free}%)";
-        };
-        tray= {
-                icon-size= 20;
-        };
-        network= {
-        interval = 5;
-        #interface= "wlp*"; // (Optional) To force the use of this interface
-        #format-wifi= "{essid} {signalStrength}% ";
-        format-wifi= "{signalStrength}% ";
-        #format-ethernet= "{ifname}: {ipaddr}/{cidr} ";
-        format-ethernet= "";
-        format-linked= "{ifname} (No IP) ";
-        format-disconnected= "Disconnected ⚠";
-        format-alt= "{ifname}: {ipaddr}/{cidr}";
-        tooltip-format-ethernet= "{ifname} via {gwaddr}: {essid} {ipaddr}/{cidr}\n\n⇡{bandwidthUpBytes} ⇣{bandwidthDownBytes}";
-        tooltip-format-wifi= "{ifname} via {gwaddr}: {essid} {ipaddr}/{cidr} \n{signaldBm}dBm @ {frequency}MHz\n\n⇡{bandwidthUpBytes} ⇣{bandwidthDownBytes}";
-        };
-    };
-};
-
-    style = ''
-@define-color foreground #fdf6e3;
-@define-color background #1a1a1a;
-@define-color background-alt #292b2e; 
-@define-color foreground-warning #268bd2;
-@define-color background-warning @background;
-@define-color foreground-error red;
-@define-color background-error @background;
-@define-color foreground-critical gold;
-@define-color background-critical blue;
-
-
-* {
-    border: none;
-    border-radius: 0;
-    font-family: Monospace, "Font Awesome 5 Free";
-    font-size: 14px;
-    min-height: 0;
-    margin: -1px 0px;
-}
-
-window#waybar {
-        background: transparent;
-        color: @foreground;
-        transition-duration: .5s;
-}
-
-window#waybar.hidden {
-    opacity: 0.2;
-}
-
-
-#mpris {
-    padding: 0 10px;
-    background-color: transparent;
-    color: #1DB954;
-    font-family: Monospace;
-    font-size: 12px;
-}
-
-#custom-right-arrow-dark,
-#custom-left-arrow-dark {
-        color: @background;
-        background: @background-alt;
-        font-size: 24px;
-}
-
-#window {
-        font-size: 12px;
-        padding: 0 20px;
-}
-
-#mode {
-    background: @background-critical;
-    color: @foreground-critical;
-    padding: 0 3px;
-}
-
-#custom-outer-right-arrow-dark,
-#custom-outer-left-arrow-dark {
-        color: @background;
-        font-size: 24px;
-}
-
-#custom-outer-left-arrow-dark,
-#custom-left-arrow-dark,
-#custom-left-arrow-light {
-        margin: 0 -1px;
-}
-
-#custom-right-arrow-light,
-#custom-left-arrow-light {
-        color: @background-alt;
-        background: @background;
-        font-size: 24px;
-}
-
-#workspaces,
-#clock.1,
-#clock.2,
-#clock.3,
-#pulseaudio,
-#memory,
-#cpu,
-#temperature,
-#mpris,
-#tray {
-        background: @background;
-}
-
-#network,
-#clock.2,
-#battery,
-#cpu,
-#disk {
-        background: @background-alt;
-}
-
-
-#workspaces button {
-        padding: 0 2px;
-        color: #fdf6e3;
-}
-#workspaces button.focused {
-        color: @foreground-warning;
-}
-
-#workspaces button:hover {
-    background: @foreground;
-    color: @background;
-        border: @foreground;
-        padding: 0 2px;
-        box-shadow: inherit;
-        text-shadow: inherit;
-}
-
-#workspaces button.urgent {
-    color: @background-critical;
-    background: @foreground-critical;
-}
-
-#network {
-    color: #cc99c9;
-}
-
-#temperature {
-    color: #9ec1cf;
-}
-
-#disk {
-    /*color: #b58900;*/
-    color: #9ee09e;
-}
-
-#disk.warning {
-    color:            @foreground-error;
-    background-color: @background-error;
-}
-#disk.critical,
-#temperature.critical {
-    color:            @foreground-critical;
-    background-color: @background-critical;
-    animation-name: blink;
-    animation-duration: 0.5s;
-    animation-timing-function: linear;
-    animation-iteration-count: infinite;
-    animation-direction: alternate;
-}
-#pulseaudio.muted {
-    color: @foreground-error;
-}
-#memory {
-        /*color: #2aa198;*/
-        color: #fdfd97;
-}
-#cpu {
-    /*color: #6c71c4;*/
-    color: #feb144;
-}
-
-#pulseaudio {
-    /*color: #268bd2;*/
-    color: #ff6663;
-}
-
-#battery {
-        color: cyan;
-}
-#battery.discharging {
-    color:      #859900;
-}
-
-@keyframes blink {
-    to {
-        color:            @foreground-error;
-        background-color: @background-error;
-    }
-}
-
-#battery.critical:not(.charging) {
-    color:            @foreground-critical;
-    background-color: @background-critical;
-    animation-name: blink;
-    animation-duration: 0.5s;
-    animation-timing-function: linear;
-    animation-iteration-count: infinite;
-    animation-direction: alternate;
-}
-
-#clock.1,
-#clock.2,
-#clock.3 {
-    font-family: Monospace;
-}
-
-#clock,
-#pulseaudio,
-#memory,
-#cpu,
-#tray,
-#temperature,
-#network,
-#mpris,
-#battery,
-#disk {
-        padding: 0 3px;
-}
-    '';
+          };
+          battery= {
+                  states= {
+                          #"good"= 95;
+                          "warning"= 60;
+                          "error"= 30;
+                          "critical"= 15;
+                  };
+                  interval=5;	
+                  format= "{icon} {capacity}%";
+                  format-charging= "{capacity}% ";
+                  format-plugged= "{capacity}% ";
+                  format-icons= [
+                          ""
+                          ""
+                          ""
+                          ""
+                          ""
+                  ];
+                  on-click-right= "wlogout -p layer-shell";
+          };
+          disk= {
+                  interval= 30;
+                  format= "Disk {percentage_used:2}%";
+                  path= "/";
+                  #on-click= "grim -g \"$(slurp)\" -t png - | wl-copy -t";
+                  on-click-right= "jdiskreport";
+                  states= {
+                            "warning"= 80;
+                             "critical"= 90;
+                  };
+                  tooltip-format = "{used} used out of {total} on {path} ({percentage_used}%)\n{free} free on {path} ({percentage_free}%)";
+          };
+          tray= {
+                  icon-size= 20;
+          };
+          network= {
+          interval = 5;
+          #interface= "wlp*"; // (Optional) To force the use of this interface
+          #format-wifi= "{essid} {signalStrength}% ";
+          format-wifi= "{signalStrength}% ";
+          #format-ethernet= "{ifname}: {ipaddr}/{cidr} ";
+          format-ethernet= "";
+          format-linked= "{ifname} (No IP) ";
+          format-disconnected= "Disconnected ⚠";
+          format-alt= "{ifname}: {ipaddr}/{cidr}";
+          tooltip-format-ethernet= "{ifname} via {gwaddr}: {essid} {ipaddr}/{cidr}\n\n⇡{bandwidthUpBytes} ⇣{bandwidthDownBytes}";
+          tooltip-format-wifi= "{ifname} via {gwaddr}: {essid} {ipaddr}/{cidr} \n{signaldBm}dBm @ {frequency}MHz\n\n⇡{bandwidthUpBytes} ⇣{bandwidthDownBytes}";
+          };
+      };
   };
+
+      style = ''
+  @define-color foreground #fdf6e3;
+  @define-color background #1a1a1a;
+  @define-color background-alt #292b2e; 
+  @define-color foreground-warning #268bd2;
+  @define-color background-warning @background;
+  @define-color foreground-error red;
+  @define-color background-error @background;
+  @define-color foreground-critical gold;
+  @define-color background-critical blue;
+
+
+  * {
+      border: none;
+      border-radius: 0;
+      font-family: Monospace, "Font Awesome 5 Free";
+      font-size: 14px;
+      min-height: 0;
+      margin: -1px 0px;
+  }
+
+  window#waybar {
+          background: transparent;
+          color: @foreground;
+          transition-duration: .5s;
+  }
+
+  window#waybar.hidden {
+      opacity: 0.2;
+  }
+
+
+  #mpris {
+      padding: 0 10px;
+      background-color: transparent;
+      color: #1DB954;
+      font-family: Monospace;
+      font-size: 12px;
+  }
+
+  #custom-right-arrow-dark,
+  #custom-left-arrow-dark {
+          color: @background;
+          background: @background-alt;
+          font-size: 24px;
+  }
+
+  #window {
+          font-size: 12px;
+          padding: 0 20px;
+  }
+
+  #mode {
+      background: @background-critical;
+      color: @foreground-critical;
+      padding: 0 3px;
+  }
+
+  #custom-outer-right-arrow-dark,
+  #custom-outer-left-arrow-dark {
+          color: @background;
+          font-size: 24px;
+  }
+
+  #custom-outer-left-arrow-dark,
+  #custom-left-arrow-dark,
+  #custom-left-arrow-light {
+          margin: 0 -1px;
+  }
+
+  #custom-right-arrow-light,
+  #custom-left-arrow-light {
+          color: @background-alt;
+          background: @background;
+          font-size: 24px;
+  }
+
+  #workspaces,
+  #clock.1,
+  #clock.2,
+  #clock.3,
+  #pulseaudio,
+  #memory,
+  #cpu,
+  #temperature,
+  #mpris,
+  #tray {
+          background: @background;
+  }
+
+  #network,
+  #clock.2,
+  #battery,
+  #cpu,
+  #disk {
+          background: @background-alt;
+  }
+
+
+  #workspaces button {
+          padding: 0 2px;
+          color: #fdf6e3;
+  }
+  #workspaces button.focused {
+          color: @foreground-warning;
+  }
+
+  #workspaces button:hover {
+      background: @foreground;
+      color: @background;
+          border: @foreground;
+          padding: 0 2px;
+          box-shadow: inherit;
+          text-shadow: inherit;
+  }
+
+  #workspaces button.urgent {
+      color: @background-critical;
+      background: @foreground-critical;
+  }
+
+  #network {
+      color: #cc99c9;
+  }
+
+  #temperature {
+      color: #9ec1cf;
+  }
+
+  #disk {
+      /*color: #b58900;*/
+      color: #9ee09e;
+  }
+
+  #disk.warning {
+      color:            @foreground-error;
+      background-color: @background-error;
+  }
+  #disk.critical,
+  #temperature.critical {
+      color:            @foreground-critical;
+      background-color: @background-critical;
+      animation-name: blink;
+      animation-duration: 0.5s;
+      animation-timing-function: linear;
+      animation-iteration-count: infinite;
+      animation-direction: alternate;
+  }
+  #pulseaudio.muted {
+      color: @foreground-error;
+  }
+  #memory {
+          /*color: #2aa198;*/
+          color: #fdfd97;
+  }
+  #cpu {
+      /*color: #6c71c4;*/
+      color: #feb144;
+  }
+
+  #pulseaudio {
+      /*color: #268bd2;*/
+      color: #ff6663;
+  }
+
+  #battery {
+          color: cyan;
+  }
+  #battery.discharging {
+      color:      #859900;
+  }
+
+  @keyframes blink {
+      to {
+          color:            @foreground-error;
+          background-color: @background-error;
+      }
+  }
+
+  #battery.critical:not(.charging) {
+      color:            @foreground-critical;
+      background-color: @background-critical;
+      animation-name: blink;
+      animation-duration: 0.5s;
+      animation-timing-function: linear;
+      animation-iteration-count: infinite;
+      animation-direction: alternate;
+  }
+
+  #clock.1,
+  #clock.2,
+  #clock.3 {
+      font-family: Monospace;
+  }
+
+  #clock,
+  #pulseaudio,
+  #memory,
+  #cpu,
+  #tray,
+  #temperature,
+  #network,
+  #mpris,
+  #battery,
+  #disk {
+          padding: 0 3px;
+  }
+      '';
+    };
 
 wayland.windowManager.sway = {
   enable = true;
@@ -650,7 +651,9 @@ wayland.windowManager.sway = {
       "${modifier}+q" = "kill";
       "${modifier}+f" = "exec firefox";
       "${modifier}+e" = "exec emacs";
-      "${modifier}+m" = "exec spotify";
+      "${modifier}+m" = "exec \"bash ~/.dotfiles/scripts/checkspotify.sh\"";
+      "${modifier}+w" = "exec \"bash ~/.dotfiles/scripts/checkschildi.sh\"";
+      "${modifier}+x" = "exec \"bash ~/.dotfiles/scripts/checkkitty.sh\"";
       "${modifier}+Shift+d" = "exec wofi --show run -Iib -l 5 -W 500 -x -10 -y -51";
       "${modifier}+n" = "exec sway output eDP-1 transform normal, splith";
       "${modifier}+t" = "exec sway output eDP-1 transform 90, splitv";
@@ -658,7 +661,7 @@ wayland.windowManager.sway = {
       "${modifier}+F12" = "scratchpad show";
       "${modifier}+p" = "exec wl-mirror eDP-1";
       "${modifier}+c" = "exec qalculate-gtk";
-      "${modifier}+x" = "mode $exit";
+      "${modifier}+Escape" = "mode $exit";
       "${modifier}+s" = "exec grim -g \"$(slurp)\" -t png - | wl-copy -t image/png";
       "${modifier}+i" = "exec \"bash ~/.dotfiles/scripts/startup.sh\"";
       "${modifier}+1" = "workspace 1:一";
@@ -691,11 +694,13 @@ wayland.windowManager.sway = {
 
     startup = [
       #{ command = "systemctl --user restart nextcloud-client"; always = true; }
-      #{ command = "systemctl --user restart syncthingtray"; always = true; }
-      #{ command = "systemctl --user restart syncthingtray";}
-      #{ command = "systemctl --user restart nextcloud-client";}
-      #{ command = "firefox"; }
-      { command = "exec \"bash ~/.dotfiles/scripts/startup.sh\"";}
+      #{ command = "schildichat-desktop"; }
+      { command = "discord";}
+      { command = "schildichat-desktop";}
+      { command = "nm-applet";}
+      { command = "syncthingtray --wait"; }
+      { command = "swaymsg workspace 1:一 && sleep 20 && nextcloud";}
+      #{ command = "exec \"bash ~/.dotfiles/scripts/startup.sh\"";}
     ];
     window = {
       border = 1;
@@ -723,9 +728,7 @@ wayland.windowManager.sway = {
     floating = {
       border = 1;
       criteria = [
-        {
-          title = "^Picture-in-Picture$";
-        }
+        {title = "^Picture-in-Picture$";}
         {app_id = "qalculate-gtk";}
         {app_id = "org.gnome.clocks";}
         {app_id = "com.github.stsdc.monitor";}
@@ -758,6 +761,12 @@ wayland.windowManager.sway = {
           };
         }
         {
+          command = "opacity 0.95";
+          criteria = {
+            app_id = "kitty";
+          };
+        }
+        {
           command = "opacity 1";
           criteria = {
             app_id = "firefox";
@@ -765,11 +774,28 @@ wayland.windowManager.sway = {
         }
         {
           command = "sticky enable, shadows enable";
-          criteria = {
-            app_id="firefox"; 
+          criteria = { 
             title="^Picture-in-Picture$";
           };
         }
+        {
+          command = "opacity 0.8, border normal, move container to scratchpad";
+          criteria = { 
+            title="kittyterm";
+          };
+        }
+        {
+          command = "resize set width 60 ppt height 60 ppt, move container to scratchpad";
+          criteria = { 
+            class="Spotify";
+          };
+        }
+        # {
+        #   command = "resize set width 60 ppt height 60 ppt, move container to scratchpad";
+        #   criteria = { 
+        #     app_id="SchildiChat";
+        #   };
+        # }
       ];	
     };
     gaps = {
@@ -800,8 +826,8 @@ mode $exit {
 
 workspace 1:一
 
-#include ~/.config/sway/config.d/*
-#exec \"bash ~/.config/scripts/startup.sh\"
+#exec \"bash ~/.dotfiles/scripts/startup.sh\"
+#include ~/.dotfiles/config.d/*
 
 ";	
 };
