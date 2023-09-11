@@ -8,11 +8,11 @@
     	# You can access packages and modules from different nixpkgs revs
     	# at the same time. Here's an working example:
     	#nixpkgs-unstable.url = "github:nixos/nixpkgs/nixos-unstable";
-      	home-manager = {
+    home-manager = {
 		#url = "github:nix-community/home-manager/release-23.05";
     url = "github:nix-community/home-manager";
-        	inputs.nixpkgs.follows = "nixpkgs";
-    	};
+    inputs.nixpkgs.follows = "nixpkgs";
+	};
   };
 
   outputs = { self, nixpkgs, home-manager }: {
@@ -20,8 +20,8 @@
     		nixos = nixpkgs.lib.nixosSystem {
         		system = "x86_64-linux";
         		modules = [
-          			./lenovo/configuration.nix
-				        ./lenovo/greetd.nix
+          			./profiles/lenovo/configuration.nix
+				        ./profiles/lenovo/greetd.nix
 #                ./system-nix.nix
         		];
 		};
@@ -33,16 +33,16 @@
 			pkgs = nixpkgs.legacyPackages.x86_64-linux;
 			#extraSpecialArgs = { inherit inputs outputs; };
 			modules = [ 
-				./lenovo/home.nix
-				./lenovo/modules/waybar.nix
+				./profiles/lenovo/home.nix
+				./profiles/lenovo/modules/waybar.nix
 			];
 		};
 		"leons@fedora" = home-manager.lib.homeManagerConfiguration {
 			pkgs = nixpkgs.legacyPackages.x86_64-linux;
 			#extraSpecialArgs = { inherit inputs outputs; };
 			modules = [ 
-				./surface/home.nix
-				./surface/modules/waybar.nix
+				./modules/common.nix
+				./profiles/surface_home.nix
 			];
 		};
 	};                	
