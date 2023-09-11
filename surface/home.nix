@@ -16,7 +16,7 @@
   home.stateVersion = "23.05"; # Please read the comment before changing.
 
   #keyboard config
-  home.keyboard.layout = "de";
+  home.keyboard.layout = "us";
 
   # The home.packages option allows you to install Nix packages into your
   # environment.
@@ -34,21 +34,21 @@
 	spotify
 	autotiling
 	schildichat-desktop-wayland
-	exa
+	eza
 	brightnessctl
 	playerctl
 	networkmanagerapplet
-  discord
+  	discord
 	libappindicator-gtk3
 	anki-bin
 	xdg-desktop-portal 
 	grim
 	slurp
-	mu
+	#mu
 	isync
-  gnome.seahorse
-  sqlite
-  gcr # needed for gnome-secrets to work
+  	gnome.seahorse
+  	sqlite
+  	gcr # needed for gnome-secrets to work
     # # Adds the 'hello' command to your environment. It prints a friendly
     # # "Hello, world!" when run.
     # pkgs.hello
@@ -67,9 +67,9 @@
   # '')
 
   # e: hides scratchpad depending on state, calls emacsclient for edit and then restores the scratchpad state
-  (pkgs.writeShellScriptBin "e" ''
-  bash ~/.config/scripts/hidekitty.sh && emacsclient -c -a nano "$@" && bash ~/.config/scripts/showkitty.sh
-  '')
+  #(pkgs.writeShellScriptBin "e" ''
+  #bash ~/.config/scripts/hidekitty.sh && emacsclient -c -a nano "$@" && bash ~/.config/scripts/showkitty.sh
+  #'')
   ];
   
   nixpkgs = {
@@ -238,8 +238,7 @@ background-color: #44475a;
 		ls = "exa -la";
 		hg = "history | grep";
 		hmswitch = "cd ~/.dotfiles; home-manager --flake .#leons@fedora switch; cd -;"; 
-		edithome = "bash ~/.config/scripts/hidekitty.sh && emacsclient -c -a nano ~/.dotfiles/lenovo/home.nix  && bash ~/.config/scripts/showkitty.sh";
-		editnix = "bash ~/.config/scripts/hidekitty.sh && emacsclient -c -a nano ~/.dotfiles/lenovo/configuration.nix  && bash ~/.config/scripts/showkitty.sh";
+		edithome = "emacsclient -c -a nano ~/.dotfiles/surface/home.nix";
     magit = "emacsclient -nc -e \"(magit-status)\"";
   };
 	enableAutosuggestions = true;
@@ -273,14 +272,20 @@ background-color: #44475a;
   programs.emacs = {
     enable = true;
     package = pkgs.emacs29;
-   };
+    extraPackages = epkgs: [
+        pkgs.mu
+    ];   
+  };
 	
   programs.password-store = {
 	enable = true;
 	package = pkgs.pass.withExtensions (exts: [exts.pass-otp]);
   };
 
- 
+  programs.mu = {
+	enable = true;
+  };
+
   wayland.windowManager.sway = {
     enable = true;
     config = rec {

@@ -147,7 +147,7 @@
 	        min-length= 6;
 		interval= 5;
 		#format= "CPU {usage:2}%";
-		format = "{icon0} {icon1} {icon2} {icon3} {icon4} {icon5} {icon6} {icon7}";
+		format = "{icon0} {icon1} {icon2} {icon3}";
      		format-icons = ["▁" "▂" "▃" "▄" "▅" "▆" "▇" "█"];		
 		#on-click= "grim -g \"$(slurp)\" -t png - | wl-copy -t";
 		on-click-right= "com.github.stsdc.monitor";   
