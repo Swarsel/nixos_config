@@ -20,10 +20,10 @@ home.packages = with pkgs; [
         networkmanagerapplet
         discord
         libappindicator-gtk3
-        anki-bin # this is the normal anki package on the unstable branch
-        xdg-desktop-portal
+        #anki-bin # install anki in system specific config
+        #xdg-desktop-portal # possibly better to install on system level
         gcr # needed for gnome-secrets to work
-        nextcloud-client
+        #nextcloud-client
 
         # screenshotting tools
         grim
@@ -58,18 +58,17 @@ home.packages = with pkgs; [
   };
 
 home.file = {
-    
+
   };
 
 home.sessionVariables = {
     EDITOR = "emacsclient -c -a nano";
-    SDL_VIDEODRIVER="wayland";
-    _JAVA_AWT_WM_NONREPARENTING=1;
-    QT_QPA_PLATFORM="wayland";
-    XDG_CURRENT_DESKTOP="sway";
-    XDG_SESSION_DESKTOP="sway";
+    # SDL_VIDEODRIVER="wayland";
+    # _JAVA_AWT_WM_NONREPARENTING=1;
+    # QT_QPA_PLATFORM="wayland";
     ANKI_WAYLAND="1";
-  };
+    #DISABLE_QT5_COMPAT="1";
+};
 
 #  services.gpg-agent = {
 #	enable = true;
@@ -97,11 +96,10 @@ home.sessionVariables = {
 
   services.blueman-applet.enable = true;
 
-  #services.nextcloud-client = {
-    #    enable = true;
-        #startInBackground = true;
-        #};
-        #};
+  services.nextcloud-client = {
+        enable = true;
+        startInBackground = true;
+        };
 
   services.emacs.enable = true;
 
@@ -191,35 +189,36 @@ background-color: #44475a;
   };
 
 programs.zsh = {
-	enable = true;
-	shellAliases = {
-		ls = "exa -la";
-		hg = "history | grep";
-		hmswitch = "cd ~/.dotfiles; home-manager --flake .#leons@fedora switch; cd -;"; 
-		edithome = "emacsclient -c -a nano ~/.dotfiles/Nix.org";
+        enable = true;
+        shellAliases = {
+                ls = "exa -la";
+                hg = "history | grep";
+                hmswitch = "cd ~/.dotfiles; home-manager --flake .#leons@fedora switch; cd -;";
+                edithome = "bash ~/.dotfiles/scripts/hidekitty.sh && emacsclient -c -a nano ~/.dotfiles/Nix.org && bash ~/.dotfiles/scripts/showkitty.sh";
+                #edithome = "emacsclient -c -a nano ~/.dotfiles/Nix.org";
     magit = "emacsclient -nc -e \"(magit-status)\"";
   };
-	enableAutosuggestions = true;
-	enableCompletion = true;
-	autocd = true;
-	cdpath = [
-		"~/.config"
-		];
-	defaultKeymap = "emacs";
-	dirHashes = {
-  		dl    = "$HOME/Downloads";
-		};
-	history = {
-		expireDuplicatesFirst = true;
-		path = "~/.histfile";
-		save = 10000;
-		size = 10000;
-		};
-	historySubstringSearch.enable = true;
-	#syntaxHighlighting.enable = true;
-	profileExtra = "eval `keychain --agents ssh --eval id_ed25519`";
-	#loginExtra = "bash -l sway";
-	#envExtra = "export EDITOR = \"emacsclient -c -a nano\"";  
+        enableAutosuggestions = true;
+        enableCompletion = true;
+        autocd = true;
+        cdpath = [
+                "~/.config"
+                ];
+        defaultKeymap = "emacs";
+        dirHashes = {
+                dl    = "$HOME/Downloads";
+                };
+        history = {
+                expireDuplicatesFirst = true;
+                path = "~/.histfile";
+                save = 10000;
+                size = 10000;
+                };
+        historySubstringSearch.enable = true;
+        #syntaxHighlighting.enable = true;
+        profileExtra = "eval `keychain --agents ssh --eval id_ed25519`";
+        #loginExtra = "bash -l sway";
+        #envExtra = "export EDITOR = \"emacsclient -c -a nano\"";  
 };
 
 programs.mbsync = {
@@ -639,197 +638,226 @@ programs.waybar = {
     };
 
 wayland.windowManager.sway = {
-  enable = true;
-  config = rec {
-    modifier = "Mod4";
-    terminal = "kitty";
-    menu = "wofi --show drun -Iib -l 5 -W 500 -x -10 -y -51";
-    bars = [{ command = "waybar";}]; 	  
-    keybindings = let
-      modifier = config.wayland.windowManager.sway.config.modifier;
-    in lib.mkOptionDefault {
-      "${modifier}+q" = "kill";
-      "${modifier}+f" = "exec firefox";
-      "${modifier}+e" = "exec emacs";
-      "${modifier}+m" = "exec \"bash ~/.dotfiles/scripts/checkspotify.sh\"";
-      "${modifier}+w" = "exec \"bash ~/.dotfiles/scripts/checkschildi.sh\"";
-      "${modifier}+x" = "exec \"bash ~/.dotfiles/scripts/checkkitty.sh\"";
-      "${modifier}+Shift+d" = "exec wofi --show run -Iib -l 5 -W 500 -x -10 -y -51";
-      "${modifier}+n" = "exec sway output eDP-1 transform normal, splith";
-      "${modifier}+t" = "exec sway output eDP-1 transform 90, splitv";
-      "${modifier}+Shift+F12" = "move scratchpad";
-      "${modifier}+F12" = "scratchpad show";
-      "${modifier}+p" = "exec wl-mirror eDP-1";
-      "${modifier}+c" = "exec qalculate-gtk";
-      "${modifier}+Escape" = "mode $exit";
-      "${modifier}+s" = "exec grim -g \"$(slurp)\" -t png - | wl-copy -t image/png";
-      "${modifier}+i" = "exec \"bash ~/.dotfiles/scripts/startup.sh\"";
-      "${modifier}+1" = "workspace 1:一";
-      "${modifier}+Shift+1" = "move container to workspace 1:一";
-      "${modifier}+2" = "workspace 2:二";
-      "${modifier}+Shift+2" = "move container to workspace 2:二";
-      "${modifier}+3" = "workspace 3:三";
-      "${modifier}+Shift+3" = "move container to workspace 3:三";
-      "${modifier}+4" = "workspace 4:四";
-      "${modifier}+Shift+4" = "move container to workspace 4:四";
-      "${modifier}+5" = "workspace 5:五";
-      "${modifier}+Shift+5" = "move container to workspace 5:五";
-      "${modifier}+6" = "workspace 6:六";
-      "${modifier}+Shift+6" = "move container to workspace 6:六";
-      "${modifier}+7" = "workspace 7:七";
-      "${modifier}+Shift+7" = "move container to workspace 7:七";
-      "${modifier}+8" = "workspace 8:八";
-      "${modifier}+Shift+8" = "move container to workspace 8:八";
-      "${modifier}+9" = "workspace 9:九";
-      "${modifier}+Shift+9" = "move container to workspace 9:九";
-      "${modifier}+0" = "workspace 10:十";
-      "${modifier}+Shift+0" = "move container to workspace 10:十";
-      "XF86AudioRaiseVolume" = "exec pactl set-sink-volume @DEFAULT_SINK@ +5%";
-      "XF86AudioLowerVolume" = "exec pactl set-sink-volume @DEFAULT_SINK@ -5%";
-      "XF86MonBrightnessUp"  = "exec brightnessctl set +5%";
-      "XF86MonBrightnessDown"= "exec brightnessctl set 5%-";
-    };
-    modes = {
-    };
+    enable = true;
+    config = rec {
+      modifier = "Mod4";
+      terminal = "kitty";
+      menu = "wofi --show drun -Iib -l 5 -W 500 -x -10 -y -51";
+      bars = [{ command = "waybar";}]; 	  
+      keybindings = let
+        modifier = config.wayland.windowManager.sway.config.modifier;
+      in lib.mkOptionDefault {
+        "${modifier}+q" = "kill";
+        "${modifier}+f" = "exec firefox";
+        "${modifier}+e" = "exec emacs";
+        "${modifier}+m" = "exec \"bash ~/.dotfiles/scripts/checkspotify.sh\"";
+        "${modifier}+w" = "exec \"bash ~/.dotfiles/scripts/checkschildi.sh\"";
+        "${modifier}+x" = "exec \"bash ~/.dotfiles/scripts/checkkitty.sh\"";
+        "${modifier}+Shift+d" = "exec wofi --show run -Iib -l 5 -W 500 -x -10 -y -51";
+        "${modifier}+n" = "exec sway output eDP-1 transform normal, splith";
+        "${modifier}+t" = "exec sway output eDP-1 transform 90, splitv";
+        "${modifier}+Shift+F12" = "move scratchpad";
+        "${modifier}+F12" = "scratchpad show";
+        "${modifier}+p" = "exec wl-mirror eDP-1";
+        "${modifier}+c" = "exec qalculate-gtk";
+        "${modifier}+Escape" = "mode $exit";
+        "${modifier}+s" = "exec grim -g \"$(slurp)\" -t png - | wl-copy -t image/png";
+        "${modifier}+i" = "exec \"bash ~/.dotfiles/scripts/startup.sh\"";
+        "${modifier}+1" = "workspace 1:一";
+        "${modifier}+Shift+1" = "move container to workspace 1:一";
+        "${modifier}+2" = "workspace 2:二";
+        "${modifier}+Shift+2" = "move container to workspace 2:二";
+        "${modifier}+3" = "workspace 3:三";
+        "${modifier}+Shift+3" = "move container to workspace 3:三";
+        "${modifier}+4" = "workspace 4:四";
+        "${modifier}+Shift+4" = "move container to workspace 4:四";
+        "${modifier}+5" = "workspace 5:五";
+        "${modifier}+Shift+5" = "move container to workspace 5:五";
+        "${modifier}+6" = "workspace 6:六";
+        "${modifier}+Shift+6" = "move container to workspace 6:六";
+        "${modifier}+7" = "workspace 7:七";
+        "${modifier}+Shift+7" = "move container to workspace 7:七";
+        "${modifier}+8" = "workspace 8:八";
+        "${modifier}+Shift+8" = "move container to workspace 8:八";
+        "${modifier}+9" = "workspace 9:九";
+        "${modifier}+Shift+9" = "move container to workspace 9:九";
+        "${modifier}+0" = "workspace 10:十";
+        "${modifier}+Shift+0" = "move container to workspace 10:十";
+        "XF86AudioRaiseVolume" = "exec pactl set-sink-volume @DEFAULT_SINK@ +5%";
+        "XF86AudioLowerVolume" = "exec pactl set-sink-volume @DEFAULT_SINK@ -5%";
+        #"XF86MonBrightnessUp"  = "exec brightnessctl set +5%";
+        #"XF86MonBrightnessDown"= "exec brightnessctl set 5%-";
+      };
+      modes = {
+      };
 
-    startup = [
-      #{ command = "systemctl --user restart nextcloud-client"; always = true; }
-      #{ command = "schildichat-desktop"; }
-      { command = "discord";}
-      { command = "schildichat-desktop";}
-      { command = "nm-applet";}
-      { command = "syncthingtray --wait"; }
-      { command = "swaymsg workspace 1:一 && sleep 20 && nextcloud";}
-      #{ command = "exec \"bash ~/.dotfiles/scripts/startup.sh\"";}
-    ];
-    window = {
-      border = 1;
-      titlebar = false;
-    };
-    assigns = {
-      #"1" = [{ class = "^Firefox$"; }];
-    };
-    colors = {
-      focused = {
-        background = "#080808";
-        border = "#80a0ff";
-        childBorder = "#80a0ff";
-        indicator = "#080808";
-        text = "#ffd700";
-      };
-      unfocused = {
-        background = "#080808";
-        border = "#80a0ff";
-        childBorder = "#303030";
-        indicator = "#80a0ff";
-        text = "#c6c6c6";
-      };
-    };
-    floating = {
-      border = 1;
-      criteria = [
-        {title = "^Picture-in-Picture$";}
-        {app_id = "qalculate-gtk";}
-        {app_id = "org.gnome.clocks";}
-        {app_id = "com.github.stsdc.monitor";}
-        {app_id = "python3";}
-        {app_id = "blueman";}
-        {app_id = "pavucontrol";}
-        {app_id = "syncthingtray";}
-        {app_id = "SchildiChat";}
-        {app_id = "com.nextcloud.desktopclient.nextcloud";}
-        {app_id = "gnome-system-monitor";}
-        {title = "(?:Open|Save) (?:File|Folder|As)";}
-        {title = "Add";}
-        {title = "com-jgoodies-jdiskreport-JDiskReport";}
-        {class = "discord";}
-        {window_role = "pop-up";}
-        {window_role = "bubble";}
-        {window_role = "dialog";}
-        {window_role = "task_dialog";}
-        {window_role = "menu";}
-        {window_role = "Preferences";}
+      startup = [
+        { command = "kitty -T kittyterm";}
+        { command = "spotify";}
+        { command = "sleep 60 && discord --start-minimized";}
+        { command = "sleep 60 && schildichat-desktop --hidden";}
+        { command = "nm-applet";}
+        { command = "sleep 60 && syncthingtray"; }
+        { command = "sleep 60 && systemctl restart --user nextcloud-client.service";}
+        { command = "anki";}
+        { command = "obsidian";}
       ];
-      titlebar = false;	
+      window = {
+        border = 1;
+        titlebar = false;
+      };
+      assigns = {
+        #"1" = [{ class = "^Firefox$"; }];
+      };
+      colors = {
+        focused = {
+          background = "#080808";
+          border = "#80a0ff";
+          childBorder = "#80a0ff";
+          indicator = "#080808";
+          text = "#ffd700";
+        };
+        unfocused = {
+          background = "#080808";
+          border = "#80a0ff";
+          childBorder = "#303030";
+          indicator = "#80a0ff";
+          text = "#c6c6c6";
+        };
+      };
+      floating = {
+        border = 1;
+        criteria = [
+          {title = "^Picture-in-Picture$";}
+          {app_id = "qalculate-gtk";}
+          {app_id = "org.gnome.clocks";}
+          {app_id = "com.github.stsdc.monitor";}
+          # {app_id = "python3";}
+          {app_id = "blueman";}
+          {app_id = "pavucontrol";}
+          {app_id = "syncthingtray";}
+          {app_id = "SchildiChat";}
+          {app_id = "com.nextcloud.desktopclient.nextcloud";}
+          {app_id = "gnome-system-monitor";}
+          {title = "(?:Open|Save) (?:File|Folder|As)";}
+          {title = "Add";}
+          {title = "com-jgoodies-jdiskreport-JDiskReport";}
+          {class = "discord";}
+          {window_role = "pop-up";}
+          {window_role = "bubble";}
+          {window_role = "dialog";}
+          {window_role = "task_dialog";}
+          {window_role = "menu";}
+          {window_role = "Preferences";}
+        ];
+        titlebar = false;	
+      };
+      window = {
+        commands = [
+          {
+            command = "opacity 0.95";
+            criteria = {
+              class = ".*";
+            };
+          }
+          {
+            command = "opacity 0.95";
+            criteria = {
+              app_id = ".*";
+            };
+          }
+          {
+            command = "opacity 1";
+            criteria = {
+              app_id = "firefox";
+            };
+          }
+          {
+            command = "sticky enable, shadows enable";
+            criteria = { 
+              title="^Picture-in-Picture$";
+            };
+          }
+          {
+            command = "opacity 0.8, sticky enable, border normal, move container to scratchpad";
+            criteria = { 
+              title="kittyterm";
+            };
+          }
+          {
+            command = "resize set width 60 ppt height 60 ppt, sticky enable, move container to scratchpad";
+            criteria = { 
+              class="Spotify";
+            };
+          }
+          # {
+          #   command = "sticky enable";
+          #   criteria = {
+          #     app_id = "com.nextcloud.desktopclient.nextcloud";
+          #   };
+          # }
+          {
+            command = "sticky enable";
+            criteria = {
+              class = "discord";
+            };
+          }
+           {
+             command = "resize set width 60 ppt height 60 ppt, sticky enable";
+             criteria = { 
+               app_id = "SchildiChat";
+             };
+           }
+          # {
+          #    command = "sticky enable, border normal";
+          #    criteria = { 
+          #      app_id = "syncthingtray";
+          #    };
+          # }
+        ];	
+      };
+      gaps = {
+        inner = 5;
+      };
     };
-    window = {
-      commands = [
-        {
-          command = "opacity 0.95";
-          criteria = {
-            class = ".*";
-          };
-        }
-        {
-          command = "opacity 0.95";
-          criteria = {
-            app_id = "kitty";
-          };
-        }
-        {
-          command = "opacity 1";
-          criteria = {
-            app_id = "firefox";
-          };
-        }
-        {
-          command = "sticky enable, shadows enable";
-          criteria = { 
-            title="^Picture-in-Picture$";
-          };
-        }
-        {
-          command = "opacity 0.8, border normal, move container to scratchpad";
-          criteria = { 
-            title="kittyterm";
-          };
-        }
-        {
-          command = "resize set width 60 ppt height 60 ppt, move container to scratchpad";
-          criteria = { 
-            class="Spotify";
-          };
-        }
-        # {
-        #   command = "resize set width 60 ppt height 60 ppt, move container to scratchpad";
-        #   criteria = { 
-        #     app_id="SchildiChat";
-        #   };
-        # }
-      ];	
-    };
-    gaps = {
-      inner = 5;
-    };
+    #wrapperFeatures = {
+    #    gtk = true;
+    #  };
+    extraSessionCommands =''
+  export SDL_VIDEODRIVER=wayland
+  export QT_QPA_PLATFORM=wayland
+  export QT_WAYLAND_DISABLE_WINDOWDECORATION="1"
+  export _JAVA_AWT_WM_NONREPARENTING=1
+  export XDG_CURRENT_DESKTOP=sway
+  export XDG_SESSION_DESKTOP=sway
+  export QTWEBENGINE_CHROMIUM_FLAGS="--no-sandbox";
+'';
+    extraConfig =let 
+      modifier = config.wayland.windowManager.sway.config.modifier;
+    in "
+  exec_always autotiling
+  set $exit \"exit: [s]leep, [p]oweroff, [r]eboot, [l]ogout\"
+  mode $exit {
+
+      bindsym --to-code {
+          s exec \"systemctl suspend\", mode \"default\"
+          p exec \"systemctl poweroff\"
+          r exec \"systemctl reboot\"
+          l exec \"swaymsg exit\"
+
+          Return mode \"default\"
+          Escape mode \"default\"
+          ${modifier}+x mode \"default\"
+      }
+  }
+
+  workspace 1:一
+
+  exec systemctl --user import-environment DISPLAY WAYLAND_DISPLAY SWAYSOCK
+  exec hash dbus-update-activation-environment 2>/dev/null && \\
+     dbus-update-activation-environment --systemd DISPLAY WAYLAND_DISPLAY SWAYSOCK        
+
+  ";	
   };
-  #wrapperFeatures = {
-  #    gtk = true;
-  #  };
-  extraConfig =let 
-    modifier = config.wayland.windowManager.sway.config.modifier;
-  in "
-exec_always autotiling
-set $exit \"exit: [s]leep, [p]oweroff, [r]eboot, [l]ogout\"
-mode $exit {
-
-    bindsym --to-code {
-        s exec \"systemctl suspend\", mode \"default\"
-        p exec \"systemctl poweroff\"
-        r exec \"systemctl reboot\"
-        l exec \"swaymsg exit\"
-
-        Return mode \"default\"
-        Escape mode \"default\"
-        ${modifier}+x mode \"default\"
-    }
-}
-
-workspace 1:一
-
-#exec \"bash ~/.dotfiles/scripts/startup.sh\"
-#include ~/.dotfiles/config.d/*
-
-";	
-};
 
 }
