@@ -45,8 +45,11 @@ home.packages = with pkgs; [
         monitor
 
     #E: hides scratchpad depending on state, calls emacsclient for edit and then restores the scratchpad state
+    # (pkgs.writeShellScriptBin "e" ''
+    # bash ~/.dotfiles/scripts/hidekitty.sh && emacsclient -c -a nano "$@" && bash ~/.dotfiles/scripts/showkitty.sh
+    # '')
     (pkgs.writeShellScriptBin "e" ''
-    bash ~/.dotfiles/scripts/hidekitty.sh && emacsclient -c -a nano "$@" && bash ~/.dotfiles/scripts/showkitty.sh
+    bash ~/.dotfiles/scripts/editor.sh "$@"
     '')
   ];
 
@@ -194,9 +197,9 @@ programs.zsh = {
                 ls = "exa -la";
                 hg = "history | grep";
                 hmswitch = "cd ~/.dotfiles; home-manager --flake .#leons@fedora switch; cd -;";
-                edithome = "bash ~/.dotfiles/scripts/hidekitty.sh && emacsclient -c -a nano ~/.dotfiles/Nix.org && bash ~/.dotfiles/scripts/showkitty.sh";
+                edithome = "bash ~/.dotfiles/scripts/editor.sh ~/.dotfiles/Nix.org";
                 #edithome = "emacsclient -c -a nano ~/.dotfiles/Nix.org";
-    magit = "emacsclient -nc -e \"(magit-status)\"";
+                magit = "emacsclient -nc -e \"(magit-status)\"";
   };
         enableAutosuggestions = true;
         enableCompletion = true;
