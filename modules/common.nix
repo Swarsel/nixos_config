@@ -1,7 +1,6 @@
 { config, pkgs, lib, fetchFromGitHub , ... }:
 
 {
-
 home.packages = with pkgs; [
         git
         firefox
@@ -20,10 +19,10 @@ home.packages = with pkgs; [
         networkmanagerapplet
         discord
         libappindicator-gtk3
-        #anki-bin # install anki in system specific config
+        anki-bin # install anki in system specific config
         #xdg-desktop-portal # possibly better to install on system level
         gcr # needed for gnome-secrets to work
-        #nextcloud-client
+        nextcloud-client
 
         # screenshotting tools
         grim
@@ -99,10 +98,10 @@ home.sessionVariables = {
 
   services.blueman-applet.enable = true;
 
-  services.nextcloud-client = {
-        enable = true;
-        startInBackground = true;
-        };
+  # services.nextcloud-client = {
+  #       enable = true;
+  #       startInBackground = true;
+  #       };
 
   services.emacs.enable = true;
 
@@ -200,6 +199,7 @@ programs.zsh = {
                 edithome = "bash ~/.dotfiles/scripts/editor.sh ~/.dotfiles/Nix.org";
                 #edithome = "emacsclient -c -a nano ~/.dotfiles/Nix.org";
                 magit = "emacsclient -nc -e \"(magit-status)\"";
+                config="/usr/bin/git --git-dir=$HOME/.cfg/ --work-tree=$HOME";
   };
         enableAutosuggestions = true;
         enableCompletion = true;
@@ -445,7 +445,7 @@ programs.waybar = {
   * {
       border: none;
       border-radius: 0;
-      font-family: Monospace, "Font Awesome 5 Free";
+      font-family: "FiraCode Nerd Font Propo", "Font Awesome 5 Free";
       font-size: 14px;
       min-height: 0;
       margin: -1px 0px;
@@ -657,17 +657,13 @@ wayland.windowManager.sway = {
         "${modifier}+w" = "exec \"bash ~/.dotfiles/scripts/checkschildi.sh\"";
         "${modifier}+x" = "exec \"bash ~/.dotfiles/scripts/checkkitty.sh\"";
         "${modifier}+Shift+d" = "exec wofi --show run -Iib -l 5 -W 500 -x -10 -y -51";
-        "${modifier}+n" = "exec sway output eDP-1 transform normal, splith";
-        "${modifier}+t" = "exec sway output eDP-1 transform 90, splitv";
         "${modifier}+Shift+F12" = "move scratchpad";
         "${modifier}+F12" = "scratchpad show";
-        "${modifier}+p" = "exec wl-mirror eDP-1";
+        "${modifier}+p" = "exec nixGL wl-mirror eDP-1";
         "${modifier}+c" = "exec qalculate-gtk";
         "${modifier}+Escape" = "mode $exit";
         "${modifier}+s" = "exec grim -g \"$(slurp)\" -t png - | wl-copy -t image/png";
         "${modifier}+i" = "exec \"bash ~/.dotfiles/scripts/startup.sh\"";
-        "${modifier}+1" = "workspace 1:一";
-        "${modifier}+Shift+1" = "move container to workspace 1:一";
         "${modifier}+2" = "workspace 2:二";
         "${modifier}+Shift+2" = "move container to workspace 2:二";
         "${modifier}+3" = "workspace 3:三";
@@ -686,6 +682,8 @@ wayland.windowManager.sway = {
         "${modifier}+Shift+9" = "move container to workspace 9:九";
         "${modifier}+0" = "workspace 10:十";
         "${modifier}+Shift+0" = "move container to workspace 10:十";
+        "${modifier}+1" = "workspace 1:一";
+        "${modifier}+Shift+1" = "move container to workspace 1:一";
         "XF86AudioRaiseVolume" = "exec pactl set-sink-volume @DEFAULT_SINK@ +5%";
         "XF86AudioLowerVolume" = "exec pactl set-sink-volume @DEFAULT_SINK@ -5%";
         #"XF86MonBrightnessUp"  = "exec brightnessctl set +5%";
@@ -701,9 +699,8 @@ wayland.windowManager.sway = {
         { command = "sleep 60 && schildichat-desktop --hidden";}
         { command = "nm-applet";}
         { command = "sleep 60 && syncthingtray"; }
-        { command = "sleep 60 && systemctl restart --user nextcloud-client.service";}
-        { command = "anki";}
-        { command = "obsidian";}
+        { command = "sleep 60 && nixGL anki";}
+        { command = "sleep 60 && nixGL obsidian";}
       ];
       window = {
         border = 1;
@@ -853,8 +850,6 @@ wayland.windowManager.sway = {
           ${modifier}+x mode \"default\"
       }
   }
-
-  workspace 1:一
 
   exec systemctl --user import-environment DISPLAY WAYLAND_DISPLAY SWAYSOCK
   exec hash dbus-update-activation-environment 2>/dev/null && \\
